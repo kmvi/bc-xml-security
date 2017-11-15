@@ -40,7 +40,7 @@ namespace System.Security.Cryptography.Xml
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 if (CipherValue != null)
                     throw new CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
 
@@ -55,7 +55,7 @@ namespace System.Security.Cryptography.Xml
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
                 if (CipherReference != null)
                     throw new CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
 
@@ -96,7 +96,7 @@ namespace System.Security.Cryptography.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             XmlNamespaceManager nsm = new XmlNamespaceManager(value.OwnerDocument.NameTable);
             nsm.AddNamespace("enc", EncryptedXml.XmlEncNamespaceUrl);

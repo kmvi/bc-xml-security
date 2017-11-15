@@ -47,7 +47,7 @@ namespace System.Security.Cryptography.Xml
         public KeyInfoX509Data(X509Certificate cert, X509IncludeOption includeOption)
         {
             if (cert == null)
-                throw new ArgumentNullException(nameof(cert));
+                throw new ArgumentNullException("cert");
 
             X509Certificate2 certificate = new X509Certificate2(cert);
             X509ChainElementCollection elements = null;
@@ -108,7 +108,7 @@ namespace System.Security.Cryptography.Xml
         public void AddCertificate(X509Certificate certificate)
         {
             if (certificate == null)
-                throw new ArgumentNullException(nameof(certificate));
+                throw new ArgumentNullException("certificate");
 
             if (_certificates == null)
                 _certificates = new ArrayList();
@@ -156,14 +156,14 @@ namespace System.Security.Cryptography.Xml
         public void AddIssuerSerial(string issuerName, string serialNumber)
         {
             if (string.IsNullOrEmpty(issuerName))
-                throw new ArgumentException(SR.Arg_EmptyOrNullString, nameof(issuerName));
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, "issuerName");
 
             if (string.IsNullOrEmpty(serialNumber))
-                throw new ArgumentException(SR.Arg_EmptyOrNullString, nameof(serialNumber));
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, "serialNumber");
 
             BigInteger h;
             if (!BigInteger.TryParse(serialNumber, NumberStyles.AllowHexSpecifier, NumberFormatInfo.CurrentInfo, out h))
-                throw new ArgumentException(SR.Cryptography_Xml_InvalidX509IssuerSerialNumber, nameof(serialNumber));
+                throw new ArgumentException(SR.Cryptography_Xml_InvalidX509IssuerSerialNumber, "serialNumber");
 
             if (_issuerSerials == null)
                 _issuerSerials = new ArrayList();
@@ -270,7 +270,7 @@ namespace System.Security.Cryptography.Xml
         public override void LoadXml(XmlElement element)
         {
             if (element == null)
-                throw new ArgumentNullException(nameof(element));
+                throw new ArgumentNullException("element");
 
             XmlNamespaceManager nsm = new XmlNamespaceManager(element.OwnerDocument.NameTable);
             nsm.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);

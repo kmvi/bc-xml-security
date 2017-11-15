@@ -144,42 +144,42 @@ namespace System.Security.Cryptography.Xml
         {
             if (value == null)
             {
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
             }
             if (value.Name != KeyValueElementName
                 || value.NamespaceURI != SignedXml.XmlDsigNamespaceUrl)
             {
-                throw new CryptographicException($"Root element must be {KeyValueElementName} element in namepsace {SignedXml.XmlDsigNamespaceUrl}");
+                throw new CryptographicException(String.Format("Root element must be {KeyValueElementName} element in namepsace {SignedXml.XmlDsigNamespaceUrl}"));
             }
 
             const string xmlDsigNamespacePrefix = "dsig";
             XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(value.OwnerDocument.NameTable);
             xmlNamespaceManager.AddNamespace(xmlDsigNamespacePrefix, SignedXml.XmlDsigNamespaceUrl);
 
-            XmlNode dsaKeyValueElement = value.SelectSingleNode($"{xmlDsigNamespacePrefix}:{DSAKeyValueElementName}", xmlNamespaceManager);
+            XmlNode dsaKeyValueElement = value.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{DSAKeyValueElementName}"), xmlNamespaceManager);
             if (dsaKeyValueElement == null)
             {
-                throw new CryptographicException($"{KeyValueElementName} must contain child element {DSAKeyValueElementName}");
+                throw new CryptographicException(String.Format("{KeyValueElementName} must contain child element {DSAKeyValueElementName}"));
             }
 
-            XmlNode yNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{YElementName}", xmlNamespaceManager);
+            XmlNode yNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{YElementName}"), xmlNamespaceManager);
             if (yNode == null)
-                throw new CryptographicException($"{YElementName} is missing");
+                throw new CryptographicException(String.Format("{YElementName} is missing"));
 
-            XmlNode pNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{PElementName}", xmlNamespaceManager);
-            XmlNode qNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{QElementName}", xmlNamespaceManager);
+            XmlNode pNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{PElementName}"), xmlNamespaceManager);
+            XmlNode qNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{QElementName}"), xmlNamespaceManager);
 
             if ((pNode == null && qNode != null) || (pNode != null && qNode == null))
-                throw new CryptographicException($"{PElementName} and {QElementName} can only occour in combination");
+                throw new CryptographicException(String.Format("{PElementName} and {QElementName} can only occour in combination"));
 
 
-            XmlNode gNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{GElementName}", xmlNamespaceManager);
-            XmlNode jNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{JElementName}", xmlNamespaceManager);
+            XmlNode gNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{GElementName}"), xmlNamespaceManager);
+            XmlNode jNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{JElementName}"), xmlNamespaceManager);
 
-            XmlNode seedNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{SeedElementName}", xmlNamespaceManager);
-            XmlNode pgenCounterNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{PgenCounterElementName}", xmlNamespaceManager);
+            XmlNode seedNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{SeedElementName}"), xmlNamespaceManager);
+            XmlNode pgenCounterNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{PgenCounterElementName}"), xmlNamespaceManager);
             if ((seedNode == null && pgenCounterNode != null) || (seedNode != null && pgenCounterNode == null))
-                throw new CryptographicException($"{SeedElementName} and {PgenCounterElementName} can only occur in combination");
+                throw new CryptographicException(String.Format("{SeedElementName} and {PgenCounterElementName} can only occur in combination"));
 
             try
             {
@@ -196,7 +196,7 @@ namespace System.Security.Cryptography.Xml
             }
             catch (Exception ex)
             {
-                throw new CryptographicException($"An error occurred parsing the key components", ex);
+                throw new CryptographicException("An error occurred parsing the key components", ex);
             }
         }
     }

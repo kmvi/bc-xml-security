@@ -44,7 +44,7 @@ namespace System.Security.Cryptography.Xml
         internal static bool IsCommittedNamespace(XmlElement element, string prefix, string value)
         {
             if (element == null)
-                throw new ArgumentNullException(nameof(element));
+                throw new ArgumentNullException("element");
 
             string name = ((prefix.Length > 0) ? "xmlns:" + prefix : "xmlns");
             if (element.HasAttribute(name) && element.GetAttribute(name) == value) return true;
@@ -54,7 +54,7 @@ namespace System.Security.Cryptography.Xml
         internal static bool IsRedundantNamespace(XmlElement element, string prefix, string value)
         {
             if (element == null)
-                throw new ArgumentNullException(nameof(element));
+                throw new ArgumentNullException("element");
 
             XmlNode ancestorNode = ((XmlNode)element).ParentNode;
             while (ancestorNode != null)
@@ -186,7 +186,7 @@ namespace System.Security.Cryptography.Xml
         internal static XmlDocument PreProcessDocumentInput(XmlDocument document, XmlResolver xmlResolver, string baseUri)
         {
             if (document == null)
-                throw new ArgumentNullException(nameof(document));
+                throw new ArgumentNullException("document");
 
             MyXmlDocument doc = new MyXmlDocument();
             doc.PreserveWhitespace = document.PreserveWhitespace;
@@ -208,7 +208,7 @@ namespace System.Security.Cryptography.Xml
         internal static XmlDocument PreProcessElementInput(XmlElement elem, XmlResolver xmlResolver, string baseUri)
         {
             if (elem == null)
-                throw new ArgumentNullException(nameof(elem));
+                throw new ArgumentNullException("elem");
 
             MyXmlDocument doc = new MyXmlDocument();
             doc.PreserveWhitespace = true;

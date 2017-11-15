@@ -183,7 +183,7 @@ namespace System.Security.Cryptography.Xml
         private byte[] GetCipherValue(CipherData cipherData)
         {
             if (cipherData == null)
-                throw new ArgumentNullException(nameof(cipherData));
+                throw new ArgumentNullException("cipherData");
 
             WebResponse response = null;
             Stream inputStream = null;
@@ -255,7 +255,7 @@ namespace System.Security.Cryptography.Xml
         public virtual byte[] GetDecryptionIV(EncryptedData encryptedData, string symmetricAlgorithmUri)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
 
             int initBytesSize = 0;
             // If the Uri is not provided by the application, try to get it from the EncryptionMethod
@@ -291,7 +291,7 @@ namespace System.Security.Cryptography.Xml
         public virtual SymmetricAlgorithm GetDecryptionKey(EncryptedData encryptedData, string symmetricAlgorithmUri)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
 
             if (encryptedData.KeyInfo == null)
                 return null;
@@ -372,7 +372,7 @@ namespace System.Security.Cryptography.Xml
         public virtual byte[] DecryptEncryptedKey(EncryptedKey encryptedKey)
         {
             if (encryptedKey == null)
-                throw new ArgumentNullException(nameof(encryptedKey));
+                throw new ArgumentNullException("encryptedKey");
             if (encryptedKey.KeyInfo == null)
                 return null;
 
@@ -474,9 +474,9 @@ namespace System.Security.Cryptography.Xml
         public void AddKeyNameMapping(string keyName, object keyObject)
         {
             if (keyName == null)
-                throw new ArgumentNullException(nameof(keyName));
+                throw new ArgumentNullException("keyName");
             if (keyObject == null)
-                throw new ArgumentNullException(nameof(keyObject));
+                throw new ArgumentNullException("keyObject");
 
             if (!(keyObject is SymmetricAlgorithm) && !(keyObject is RSA))
                 throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
@@ -493,9 +493,9 @@ namespace System.Security.Cryptography.Xml
         public EncryptedData Encrypt(XmlElement inputElement, X509Certificate2 certificate)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (certificate == null)
-                throw new ArgumentNullException(nameof(certificate));
+                throw new ArgumentNullException("certificate");
 
             using (RSA rsaPublicKey = certificate.GetRSAPublicKey())
             {
@@ -531,9 +531,9 @@ namespace System.Security.Cryptography.Xml
         public EncryptedData Encrypt(XmlElement inputElement, string keyName)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (keyName == null)
-                throw new ArgumentNullException(nameof(keyName));
+                throw new ArgumentNullException("keyName");
 
             object encryptionKey = null;
             if (_keyNameMapping != null)
@@ -628,9 +628,9 @@ namespace System.Security.Cryptography.Xml
         public byte[] EncryptData(byte[] plaintext, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (plaintext == null)
-                throw new ArgumentNullException(nameof(plaintext));
+                throw new ArgumentNullException("plaintext");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             // save the original symmetric algorithm
             CipherMode origMode = symmetricAlgorithm.Mode;
@@ -671,9 +671,9 @@ namespace System.Security.Cryptography.Xml
         public byte[] EncryptData(XmlElement inputElement, SymmetricAlgorithm symmetricAlgorithm, bool content)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             byte[] plainText = (content ? _encoding.GetBytes(inputElement.InnerXml) : _encoding.GetBytes(inputElement.OuterXml));
             return EncryptData(plainText, symmetricAlgorithm);
@@ -683,9 +683,9 @@ namespace System.Security.Cryptography.Xml
         public byte[] DecryptData(EncryptedData encryptedData, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             // get the cipher value and decrypt
             byte[] cipherValue = GetCipherValue(encryptedData.CipherData);
@@ -730,9 +730,9 @@ namespace System.Security.Cryptography.Xml
         public void ReplaceData(XmlElement inputElement, byte[] decryptedData)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (decryptedData == null)
-                throw new ArgumentNullException(nameof(decryptedData));
+                throw new ArgumentNullException("decryptedData");
 
             XmlNode parent = inputElement.ParentNode;
             if (parent.NodeType == XmlNodeType.Document)
@@ -800,9 +800,9 @@ namespace System.Security.Cryptography.Xml
         public static void ReplaceElement(XmlElement inputElement, EncryptedData encryptedData, bool content)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
 
             // First, get the XML representation of the EncryptedData object
             XmlElement elemED = encryptedData.GetXml(inputElement.OwnerDocument);
@@ -826,9 +826,9 @@ namespace System.Security.Cryptography.Xml
         public static byte[] EncryptKey(byte[] keyData, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             if (symmetricAlgorithm is TripleDES)
             {
@@ -850,9 +850,9 @@ namespace System.Security.Cryptography.Xml
         public static byte[] EncryptKey(byte[] keyData, RSA rsa, bool useOAEP)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (rsa == null)
-                throw new ArgumentNullException(nameof(rsa));
+                throw new ArgumentNullException("rsa");
 
             if (useOAEP)
             {
@@ -870,9 +870,9 @@ namespace System.Security.Cryptography.Xml
         public static byte[] DecryptKey(byte[] keyData, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             if (symmetricAlgorithm is TripleDES)
             {
@@ -893,9 +893,9 @@ namespace System.Security.Cryptography.Xml
         public static byte[] DecryptKey(byte[] keyData, RSA rsa, bool useOAEP)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (rsa == null)
-                throw new ArgumentNullException(nameof(rsa));
+                throw new ArgumentNullException("rsa");
 
             if (useOAEP)
             {

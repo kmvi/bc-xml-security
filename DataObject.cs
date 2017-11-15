@@ -29,7 +29,7 @@ namespace System.Security.Cryptography.Xml
         public DataObject(string id, string mimeType, string encoding, XmlElement data)
         {
             if (data == null)
-                throw new ArgumentNullException(nameof(data));
+                throw new ArgumentNullException("data");
 
             _id = id;
             _mimeType = mimeType;
@@ -79,7 +79,7 @@ namespace System.Security.Cryptography.Xml
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
 
                 // Reset the node list
                 _elData = new CanonicalXmlNodeList();
@@ -137,7 +137,7 @@ namespace System.Security.Cryptography.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             _id = Utils.GetAttribute(value, "Id", SignedXml.XmlDsigNamespaceUrl);
             _mimeType = Utils.GetAttribute(value, "MimeType", SignedXml.XmlDsigNamespaceUrl);

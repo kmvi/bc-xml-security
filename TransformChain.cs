@@ -58,7 +58,7 @@ namespace System.Security.Cryptography.Xml
             get
             {
                 if (index >= _transforms.Count)
-                    throw new ArgumentException(SR.ArgumentOutOfRange_Index, nameof(index));
+                    throw new ArgumentException(SR.ArgumentOutOfRange_Index, "index");
                 return (Transform)_transforms[index];
             }
         }
@@ -186,7 +186,7 @@ namespace System.Security.Cryptography.Xml
         internal void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             XmlNamespaceManager nsm = new XmlNamespaceManager(value.OwnerDocument.NameTable);
             nsm.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);

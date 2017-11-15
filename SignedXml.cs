@@ -101,14 +101,14 @@ namespace System.Security.Cryptography.Xml
         public SignedXml(XmlDocument document)
         {
             if (document == null)
-                throw new ArgumentNullException(nameof(document));
+                throw new ArgumentNullException("document");
             Initialize(document.DocumentElement);
         }
 
         public SignedXml(XmlElement elem)
         {
             if (elem == null)
-                throw new ArgumentNullException(nameof(elem));
+                throw new ArgumentNullException("elem");
             Initialize(elem);
         }
 
@@ -222,7 +222,7 @@ namespace System.Security.Cryptography.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             m_signature.LoadXml(value);
 
@@ -426,7 +426,7 @@ namespace System.Security.Cryptography.Xml
         public void ComputeSignature(KeyedHashAlgorithm macAlg)
         {
             if (macAlg == null)
-                throw new ArgumentNullException(nameof(macAlg));
+                throw new ArgumentNullException("macAlg");
 
             HMAC hash = macAlg as HMAC;
             if (hash == null)
@@ -1013,7 +1013,7 @@ namespace System.Security.Cryptography.Xml
         private bool CheckSignedInfo(AsymmetricAlgorithm key)
         {
             if (key == null)
-                throw new ArgumentNullException(nameof(key));
+                throw new ArgumentNullException("key");
 
             SignedXmlDebugLog.LogBeginCheckSignedInfo(this, m_signature.SignedInfo);
 
@@ -1045,7 +1045,7 @@ namespace System.Security.Cryptography.Xml
         private bool CheckSignedInfo(KeyedHashAlgorithm macAlg)
         {
             if (macAlg == null)
-                throw new ArgumentNullException(nameof(macAlg));
+                throw new ArgumentNullException("macAlg");
 
             SignedXmlDebugLog.LogBeginCheckSignedInfo(this, m_signature.SignedInfo);
 

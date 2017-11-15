@@ -109,7 +109,7 @@ namespace System.Security.Cryptography.Xml
         public virtual void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             ReferenceType = value.LocalName;
             Uri = Utils.GetAttribute(value, "URI", EncryptedXml.XmlEncNamespaceUrl);

@@ -64,9 +64,12 @@ namespace System.Security.Cryptography.Xml
             }
             finally
             {
-                enc2?.Dispose();
-                enc1?.Dispose();
-                tripleDES?.Dispose();
+                if (enc2 != null)
+                    enc2.Dispose();
+                if (enc1 != null)
+                    enc1.Dispose();
+                if (tripleDES != null)
+                    tripleDES.Dispose();
             }
         }
 
@@ -114,9 +117,12 @@ namespace System.Security.Cryptography.Xml
             }
             finally
             {
-                dec2?.Dispose();
-                dec1?.Dispose();
-                tripleDES?.Dispose();
+                if (dec2 != null)
+                    dec2.Dispose();
+                if (dec1 != null)
+                    dec1.Dispose();
+                if (tripleDES != null)
+                    tripleDES.Dispose();
             }
         }
 
@@ -178,8 +184,10 @@ namespace System.Security.Cryptography.Xml
             }
             finally
             {
-                enc?.Dispose();
-                aes?.Dispose();
+                if (enc != null)
+                    enc.Dispose();
+                if (aes != null)
+                    aes.Dispose();
             }
         }
 
@@ -247,8 +255,10 @@ namespace System.Security.Cryptography.Xml
             }
             finally
             {
-                dec?.Dispose();
-                aes?.Dispose();
+                if (dec != null)
+                    dec.Dispose();
+                if (aes != null)
+                    aes.Dispose();
             }
         }
     }

@@ -204,7 +204,7 @@ namespace System.Security.Cryptography.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             // SignedInfo
             XmlElement signedInfoElement = value;
@@ -259,7 +259,7 @@ namespace System.Security.Cryptography.Xml
         public void AddReference(Reference reference)
         {
             if (reference == null)
-                throw new ArgumentNullException(nameof(reference));
+                throw new ArgumentNullException("reference");
 
             reference.SignedXml = SignedXml;
             _references.Add(reference);
