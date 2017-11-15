@@ -9,7 +9,7 @@ using System.Text;
 using System.Collections;
 using System.Security.Cryptography;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     // the central dispatcher for canonicalization writes. not all node classes
     // implement ICanonicalizableNode; so a manual dispatch is sometimes necessary.

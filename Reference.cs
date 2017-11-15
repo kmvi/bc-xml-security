@@ -11,7 +11,7 @@ using System.Xml;
 using System.Globalization;
 using System.Runtime.Versioning;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public class Reference
     {

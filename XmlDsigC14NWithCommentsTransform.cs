@@ -12,7 +12,7 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public class XmlDsigC14NWithCommentsTransform : XmlDsigC14NTransform
     {

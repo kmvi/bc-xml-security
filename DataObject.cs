@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Xml;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public class DataObject
     {

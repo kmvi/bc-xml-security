@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Collections;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     // the namespaces context corresponding to one XmlElement. the rendered list contains the namespace nodes that are actually
     // rendered to the canonicalized output. the unrendered list contains the namespace nodes that are in the node set and have

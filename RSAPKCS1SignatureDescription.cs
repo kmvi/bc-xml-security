@@ -2,7 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-namespace System.Security.Cryptography.Xml
+using System.Security.Cryptography;
+namespace Org.BouncyCastle.Crypto.Xml
 {
     internal abstract class RSAPKCS1SignatureDescription : SignatureDescription
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace System.Security.Cryptography.Xml {
+namespace Org.BouncyCastle.Crypto.Xml {
     using System;
     
     

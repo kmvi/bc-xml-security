@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     internal enum CertUsageType
     {

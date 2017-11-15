@@ -13,7 +13,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     /// <summary>
     ///     Trace support for debugging issues signing and verifying XML signatures.

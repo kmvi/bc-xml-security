@@ -9,7 +9,7 @@ using System.Text;
 using System.Collections;
 using System.Security.Cryptography;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     // all input types eventually lead to the creation of an XmlDocument document
     // of this type. it maintains the node subset state and performs output rendering during canonicalization

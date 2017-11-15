@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Collections;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     // This class does lexicographic sorting by NamespaceURI first and then by LocalName.
     internal class AttributeSortOrder : IComparer

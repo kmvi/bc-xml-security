@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Collections;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     // the stack of currently active NamespaceFrame contexts. this
     // object also maintains the inclusive prefix list in a tokenized form.

@@ -4,7 +4,7 @@
 
 using System.IO;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public interface IRelDecryptor
     {

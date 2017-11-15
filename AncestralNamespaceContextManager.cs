@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Collections;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     internal abstract class AncestralNamespaceContextManager
     {

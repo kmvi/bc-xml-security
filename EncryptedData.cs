@@ -4,9 +4,10 @@
 
 using System;
 using System.Collections;
+using System.Security.Cryptography;
 using System.Xml;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public sealed class EncryptedData : EncryptedType
     {

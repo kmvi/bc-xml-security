@@ -7,8 +7,9 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Xml;
 using System.Globalization;
+using System.Security.Cryptography;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public class SignedInfo : ICollection
     {

@@ -4,7 +4,7 @@
 
 using System.Xml;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public abstract class KeyInfoClause
     {

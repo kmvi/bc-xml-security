@@ -9,7 +9,7 @@ using System.Collections;
 using System.Security.Cryptography;
 using System;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     internal class ExcCanonicalXml
     {

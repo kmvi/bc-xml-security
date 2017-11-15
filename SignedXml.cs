@@ -16,7 +16,7 @@ using System.Security.Permissions;
 using System.Xml;
 using Microsoft.Win32;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     public class SignedXml
     {

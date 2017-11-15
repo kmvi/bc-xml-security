@@ -5,7 +5,7 @@
 using System;
 using System.Xml;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     /// <summary>
     /// This exception helps catch the signed XML recursion limit error.

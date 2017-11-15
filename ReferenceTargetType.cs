@@ -4,7 +4,7 @@
 
 using System;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     internal enum ReferenceTargetType
     {

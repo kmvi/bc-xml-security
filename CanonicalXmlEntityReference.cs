@@ -9,7 +9,7 @@ using System.Text;
 using System.Collections;
 using System.Security.Cryptography;
 
-namespace System.Security.Cryptography.Xml
+namespace Org.BouncyCastle.Crypto.Xml
 {
     // the class that provides node subset state and canonicalization function to XmlEntityReference
     internal class CanonicalXmlEntityReference : XmlEntityReference, ICanonicalizableNode
