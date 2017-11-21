@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignedXml", "SignedXml.csproj", "{3F7BAADF-7273-4B8F-A821-4B52419C1A2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignedXml", "SignedXml\SignedXml.csproj", "{3F7BAADF-7273-4B8F-A821-4B52419C1A2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
