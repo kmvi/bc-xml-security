@@ -60,6 +60,9 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return SignerUtilities.GetSigner("SHA384WITHRSA");
                 case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512":
                     return SignerUtilities.GetSigner("SHA512WITHRSA");
+                case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411":
+                case "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411":
+                    return SignerUtilities.GetSigner("GOST3411WITHECGOST3410");
 
                 // workarounds for issue https://github.com/dotnet/corefx/issues/16563
                 // remove attribute from this method when removing them
@@ -67,6 +70,9 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return DigestUtilities.GetDigest("SHA-1");
                 case "MD5":
                     return DigestUtilities.GetDigest("MD5");
+                case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr3411":
+                case "http://www.w3.org/2001/04/xmldsig-more#gostr3411":
+                    return DigestUtilities.GetDigest("GOST3411");
                 case "http://www.w3.org/2001/04/xmldsig-more#hmac-md5":
                     return MacUtilities.GetMac("HMAC-MD5");
                 case "http://www.w3.org/2001/04/xmlenc#tripledes-cbc":
