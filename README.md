@@ -3,7 +3,7 @@ XML Signature with Bouncy Castle
 
 ### TODO
 - [ ] EncryptedXml
-- [ ] GOST support
+- [x] GOST support
 
 ### Example
 
