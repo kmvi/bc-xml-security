@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Security.Cryptography;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -55,7 +54,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         new internal XmlElement GetXml(XmlDocument document)
         {
             if (ReferenceType == null)
-                throw new CryptographicException(SR.Cryptography_Xml_ReferenceTypeRequired);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_ReferenceTypeRequired);
 
             // Create the Reference
             XmlElement referenceElement = document.CreateElement(ReferenceType, EncryptedXml.XmlEncNamespaceUrl);

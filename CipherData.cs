@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Security.Cryptography;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -43,7 +42,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 if (value == null)
                     throw new ArgumentNullException("value");
                 if (CipherValue != null)
-                    throw new CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
 
                 _cipherReference = value;
                 _cachedXml = null;
@@ -58,7 +57,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 if (value == null)
                     throw new ArgumentNullException("value");
                 if (CipherReference != null)
-                    throw new CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
 
                 _cipherValue = (byte[])value.Clone();
                 _cachedXml = null;
@@ -88,7 +87,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             {
                 // No CipherValue specified, see if there is a CipherReference
                 if (CipherReference == null)
-                    throw new CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
                 cipherDataElement.AppendChild(CipherReference.GetXml(document));
             }
             return cipherDataElement;
@@ -107,7 +106,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (cipherValueNode != null)
             {
                 if (cipherReferenceNode != null)
-                    throw new CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
                 _cipherValue = Convert.FromBase64String(Utils.DiscardWhiteSpaces(cipherValueNode.InnerText));
             }
             else if (cipherReferenceNode != null)
@@ -117,7 +116,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             else
             {
-                throw new CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CipherValueElementRequired);
             }
 
             // Save away the cached value

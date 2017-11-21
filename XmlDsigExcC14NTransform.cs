@@ -7,7 +7,6 @@ using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -115,9 +114,9 @@ namespace Org.BouncyCastle.Crypto.Xml
             return new MemoryStream(_excCanonicalXml.GetBytes());
         }
 
-        public override byte[] GetDigestedOutput(HashAlgorithm hash)
+        public override void GetDigestedOutput(ISigner signer)
         {
-            return _excCanonicalXml.GetDigestedBytes(hash);
+            _excCanonicalXml.GetDigestedBytes(signer);
         }
     }
 }

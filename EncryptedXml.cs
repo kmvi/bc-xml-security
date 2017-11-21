@@ -6,8 +6,6 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Net;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using System.Text;
 using System.Xml;
@@ -887,7 +885,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 return SymmetricKeyWrap.AESKeyWrapDecrypt(symmetricAlgorithm.Key, keyData);
             }
             // throw an exception if the transform is not in the previous categories
-            throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
+            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
         }
 
         // decrypts the supplied data using an RSA key and specifies whether we want to use OAEP 

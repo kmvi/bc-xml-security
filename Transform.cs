@@ -19,7 +19,6 @@ using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -158,9 +157,16 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public abstract object GetOutput(Type type);
 
-        public virtual byte[] GetDigestedOutput(HashAlgorithm hash)
+        public virtual void GetDigestedOutput(ISigner signer)
         {
-            return hash.ComputeHash((Stream)GetOutput(typeof(Stream)));
+            // Default the buffer size to 4K.
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            var inputStream = (Stream)GetOutput(typeof(Stream));
+            signer.Reset();
+            while ((bytesRead = inputStream.Read(buffer, 0, buffer.Length)) > 0) {
+                signer.BlockUpdate(buffer, 0, bytesRead);
+            }
         }
 
         public XmlElement Context

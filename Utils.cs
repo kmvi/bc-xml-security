@@ -3,14 +3,16 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Win32;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.X509;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Security;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
@@ -315,7 +317,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 int startId = idref.IndexOf("id(", StringComparison.Ordinal);
                 int endId = idref.IndexOf(")", StringComparison.Ordinal);
                 if (endId < 0 || endId < startId + 3)
-                    throw new CryptographicException(SR.Cryptography_Xml_InvalidReference);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidReference);
                 idref = idref.Substring(startId + 3, endId - startId - 3);
                 idref = idref.Replace("\'", "");
                 idref = idref.Replace("\"", "");
@@ -334,7 +336,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 int startId = idref.IndexOf("id(", StringComparison.Ordinal);
                 int endId = idref.IndexOf(")", StringComparison.Ordinal);
                 if (endId < 0 || endId < startId + 3)
-                    throw new CryptographicException(SR.Cryptography_Xml_InvalidReference);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidReference);
                 idref = idref.Substring(startId + 3, endId - startId - 3);
                 idref = idref.Replace("\'", "");
                 idref = idref.Replace("\"", "");
@@ -606,13 +608,13 @@ namespace Org.BouncyCastle.Crypto.Xml
             return index + 1;
         }
 
-        internal static X509Certificate2Collection BuildBagOfCerts(KeyInfoX509Data keyInfoX509Data, CertUsageType certUsageType)
+        internal static IList<X509Certificate> BuildBagOfCerts(KeyInfoX509Data keyInfoX509Data, CertUsageType certUsageType)
         {
-            X509Certificate2Collection collection = new X509Certificate2Collection();
+            var collection = new List<X509Certificate>();
             ArrayList decryptionIssuerSerials = (certUsageType == CertUsageType.Decryption ? new ArrayList() : null);
             if (keyInfoX509Data.Certificates != null)
             {
-                foreach (X509Certificate2 certificate in keyInfoX509Data.Certificates)
+                foreach (X509Certificate certificate in keyInfoX509Data.Certificates)
                 {
                     switch (certUsageType)
                     {
@@ -620,7 +622,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                             collection.Add(certificate);
                             break;
                         case CertUsageType.Decryption:
-                            decryptionIssuerSerials.Add(new X509IssuerSerial(certificate.IssuerName.Name, certificate.SerialNumber));
+                            decryptionIssuerSerials.Add(new X509IssuerSerial(certificate.IssuerDN.ToString(), certificate.SerialNumber.ToString()));
                             break;
                     }
                 }
@@ -631,7 +633,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 return collection;
 
             // Open LocalMachine and CurrentUser "Other People"/"My" stores.
-
+            /*
             X509Store[] stores = new X509Store[2];
             string storeName = (certUsageType == CertUsageType.Verification ? "AddressBook" : "My");
             stores[0] = new X509Store(storeName, StoreLocation.CurrentUser);
@@ -681,7 +683,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         }
                     }
                     // Store doesn't exist, no read permissions, other system error
-                    catch (CryptographicException) { }
+                    catch (System.Security.Cryptography.CryptographicException) { }
                     // Opening LocalMachine stores (other than Root or CertificateAuthority) on Linux
                     catch (PlatformNotSupportedException) { }
 
@@ -689,7 +691,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         collection.AddRange(filters);
                 }
             }
-
+            */
             return collection;
         }
 
@@ -744,20 +746,37 @@ namespace Org.BouncyCastle.Crypto.Xml
                 return 0xFF;
         }
 
-        internal static bool IsSelfSigned(X509Chain chain)
+        internal static bool IsSelfSigned(IList<X509Certificate> chain)
         {
-            X509ChainElementCollection elements = chain.ChainElements;
-            if (elements.Count != 1)
+            if (chain.Count != 1)
                 return false;
-            X509Certificate2 certificate = elements[0].Certificate;
-            if (String.Compare(certificate.SubjectName.Name, certificate.IssuerName.Name, StringComparison.OrdinalIgnoreCase) == 0)
+            X509Certificate certificate = chain[0];
+            if (String.Compare(certificate.SubjectDN.ToString(), certificate.IssuerDN.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
                 return true;
             return false;
         }
 
-        internal static AsymmetricAlgorithm GetAnyPublicKey(X509Certificate2 certificate)
+        internal static AsymmetricKeyParameter GetAnyPublicKey(X509Certificate certificate)
         {
-            return (AsymmetricAlgorithm)certificate.GetRSAPublicKey();
+            return certificate.GetPublicKey();
+        }
+
+        internal static IDigest GetSignerDigest(ISigner signer)
+        {
+            var fields = signer.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+            var digestType = typeof(IDigest);
+            foreach (var field in fields) {
+                if (digestType.IsAssignableFrom(field.FieldType)) {
+                    return (IDigest)field.GetValue(signer);
+                }
+            }
+            throw new InvalidOperationException();
+        }
+
+        internal static X509Certificate CloneCertificate(X509Certificate cert)
+        {
+            var parser = new X509CertificateParser();
+            return parser.ReadCertificate(cert.GetEncoded());
         }
     }
 }

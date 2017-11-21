@@ -2,8 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.Security;
+using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -31,10 +32,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return new XmlDsigXsltTransform();
                 case "http://www.w3.org/2000/09/xmldsig#enveloped-signature":
                     return new XmlDsigEnvelopedSignatureTransform();
-                case "http://www.w3.org/2002/07/decrypt#XML":
-                    return new XmlDecryptionTransform();
-                case "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform":
-                    return new XmlLicenseTransform();
+                //case "http://www.w3.org/2002/07/decrypt#XML":
+                //    return new XmlDecryptionTransform();
+                //case "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform":
+                //    return new XmlLicenseTransform();
                 case "http://www.w3.org/2000/09/xmldsig# X509Data":
                     return new KeyInfoX509Data();
                 case "http://www.w3.org/2000/09/xmldsig# KeyName":
@@ -45,36 +46,34 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return new RSAKeyValue();
                 case "http://www.w3.org/2000/09/xmldsig# RetrievalMethod":
                     return new KeyInfoRetrievalMethod();
-                case "http://www.w3.org/2001/04/xmlenc# EncryptedKey":
-                    return new KeyInfoEncryptedKey();
+                //case "http://www.w3.org/2001/04/xmlenc# EncryptedKey":
+                //    return new KeyInfoEncryptedKey();
                 case "http://www.w3.org/2000/09/xmldsig#dsa-sha1":
-                    return new DSASignatureDescription();
                 case "System.Security.Cryptography.DSASignatureDescription":
-                    return new DSASignatureDescription();
+                    return SignerUtilities.GetSigner("DSAWITHSHA1");
                 case "http://www.w3.org/2000/09/xmldsig#rsa-sha1":
-                    return new RSAPKCS1SHA1SignatureDescription();
                 case "System.Security.Cryptography.RSASignatureDescription":
-                    return new RSAPKCS1SHA1SignatureDescription();
+                    return SignerUtilities.GetSigner("SHA1WITHRSA");
                 case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256":
-                    return new RSAPKCS1SHA256SignatureDescription();
+                    return SignerUtilities.GetSigner("SHA256WITHRSA");
                 case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384":
-                    return new RSAPKCS1SHA384SignatureDescription();
+                    return SignerUtilities.GetSigner("SHA384WITHRSA");
                 case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512":
-                    return new RSAPKCS1SHA512SignatureDescription();
+                    return SignerUtilities.GetSigner("SHA512WITHRSA");
 
                 // workarounds for issue https://github.com/dotnet/corefx/issues/16563
                 // remove attribute from this method when removing them
                 case "http://www.w3.org/2000/09/xmldsig#sha1":
-                    return SHA1.Create();
+                    return DigestUtilities.GetDigest("SHA-1");
                 case "MD5":
-                    return MD5.Create();
+                    return DigestUtilities.GetDigest("MD5");
                 case "http://www.w3.org/2001/04/xmldsig-more#hmac-md5":
-                    return new HMACMD5();
+                    return MacUtilities.GetMac("HMAC-MD5");
                 case "http://www.w3.org/2001/04/xmlenc#tripledes-cbc":
-                    return TripleDES.Create();
+                    return CipherUtilities.GetCipher("DESede/CBC/PKCS7Padding");
             }
 
-            return CryptoConfig.CreateFromName(name);
+            throw new NotSupportedException(name);
         }
     }
 }

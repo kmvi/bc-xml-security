@@ -7,7 +7,6 @@ using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -54,7 +53,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override void LoadInnerXml(XmlNodeList nodeList)
         {
             if (nodeList == null)
-                throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
             // check that the XSLT element is well formed
             XmlElement firstDataElement = null;
             int count = 0;
@@ -65,7 +64,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 if (node is XmlElement)
                 {
                     if (count != 0)
-                        throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                     firstDataElement = node as XmlElement;
                     count++;
                     continue;
@@ -74,7 +73,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 count++;
             }
             if (count != 1 || firstDataElement == null)
-                throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
             _xslNodes = nodeList;
             _xslFragment = firstDataElement.OuterXml.Trim(null);
         }

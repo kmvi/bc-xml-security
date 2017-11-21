@@ -7,7 +7,6 @@ using System.Xml;
 using System.IO;
 using System.Text;
 using System.Collections;
-using System.Security.Cryptography;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -44,7 +43,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 strBuilder.Append((char)10);
         }
 
-        public void WriteHash(HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (!IsInNodeSet)
                 return;
@@ -54,23 +53,23 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (docPos == DocPosition.AfterRootElement)
             {
                 rgbData = utf8.GetBytes("(char) 10");
-                hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+                signer.BlockUpdate(rgbData, 0, rgbData.Length);
             }
             rgbData = utf8.GetBytes("<?");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            signer.BlockUpdate(rgbData, 0, rgbData.Length);
             rgbData = utf8.GetBytes((Name));
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            signer.BlockUpdate(rgbData, 0, rgbData.Length);
             if ((Value != null) && (Value.Length > 0))
             {
                 rgbData = utf8.GetBytes(" " + Value);
-                hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+                signer.BlockUpdate(rgbData, 0, rgbData.Length);
             }
             rgbData = utf8.GetBytes("?>");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            signer.BlockUpdate(rgbData, 0, rgbData.Length);
             if (docPos == DocPosition.BeforeRootElement)
             {
                 rgbData = utf8.GetBytes("(char) 10");
-                hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+                signer.BlockUpdate(rgbData, 0, rgbData.Length);
             }
         }
     }

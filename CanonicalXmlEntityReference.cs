@@ -7,7 +7,6 @@ using System.Xml;
 using System.IO;
 using System.Text;
 using System.Collections;
-using System.Security.Cryptography;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -34,10 +33,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                 CanonicalizationDispatcher.WriteGenericNode(this, strBuilder, docPos, anc);
         }
 
-        public void WriteHash(HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (IsInNodeSet)
-                CanonicalizationDispatcher.WriteHashGenericNode(this, hash, docPos, anc);
+                CanonicalizationDispatcher.WriteHashGenericNode(this, signer, docPos, anc);
         }
     }
 }

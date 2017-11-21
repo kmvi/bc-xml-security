@@ -19,7 +19,6 @@ using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -99,7 +98,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         }
                         else
                         {
-                            throw new CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
                         }
                     }
                     if (currentInput is XmlNodeList)
@@ -115,7 +114,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         }
                         else
                         {
-                            throw new CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
                         }
                     }
                     if (currentInput is XmlDocument)
@@ -131,10 +130,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                         }
                         else
                         {
-                            throw new CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
                         }
                     }
-                    throw new CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
                 }
             }
 
@@ -155,7 +154,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 MemoryStream ms = new MemoryStream(c14n.GetBytes());
                 return ms;
             }
-            throw new CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
+            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_TransformIncorrectInputType);
         }
 
         internal Stream TransformToOctetStream(Stream input, XmlResolver resolver, string baseUri)
@@ -194,7 +193,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             XmlNodeList transformNodes = value.SelectNodes("ds:Transform", nsm);
             if (transformNodes.Count == 0)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidElement, "Transforms");
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "Transforms");
 
             _transforms.Clear();
             for (int i = 0; i < transformNodes.Count; ++i)
@@ -203,7 +202,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 string algorithm = Utils.GetAttribute(transformElement, "Algorithm", SignedXml.XmlDsigNamespaceUrl);
                 Transform transform = CryptoHelpers.CreateFromName(algorithm) as Transform;
                 if (transform == null)
-                    throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                 // let the transform read the children of the transformElement for data
                 transform.LoadInnerXml(transformElement.ChildNodes);
                 _transforms.Add(transform);

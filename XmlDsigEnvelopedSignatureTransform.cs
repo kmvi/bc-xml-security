@@ -7,7 +7,6 @@ using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -89,7 +88,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             doc.Load(xmlReader);
             _containingDocument = doc;
             if (_containingDocument == null)
-                throw new CryptographicException(SR.Cryptography_Xml_EnvelopedSignatureRequiresContext);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_EnvelopedSignatureRequiresContext);
             _nsm = new XmlNamespaceManager(_containingDocument.NameTable);
             _nsm.AddNamespace("dsig", SignedXml.XmlDsigNamespaceUrl);
         }
@@ -101,7 +100,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 throw new ArgumentNullException("nodeList");
             _containingDocument = Utils.GetOwnerDocument(nodeList);
             if (_containingDocument == null)
-                throw new CryptographicException(SR.Cryptography_Xml_EnvelopedSignatureRequiresContext);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_EnvelopedSignatureRequiresContext);
 
             _nsm = new XmlNamespaceManager(_containingDocument.NameTable);
             _nsm.AddNamespace("dsig", SignedXml.XmlDsigNamespaceUrl);
@@ -120,7 +119,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override object GetOutput()
         {
             if (_containingDocument == null)
-                throw new CryptographicException(SR.Cryptography_Xml_EnvelopedSignatureRequiresContext);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_EnvelopedSignatureRequiresContext);
 
             // If we have received an XmlNodeList as input
             if (_inputNodeList != null)

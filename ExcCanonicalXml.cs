@@ -6,7 +6,6 @@ using System.Xml;
 using System.IO;
 using System.Text;
 using System.Collections;
-using System.Security.Cryptography;
 using System;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -63,14 +62,9 @@ namespace Org.BouncyCastle.Crypto.Xml
             return utf8.GetBytes(sb.ToString());
         }
 
-        internal byte[] GetDigestedBytes(HashAlgorithm hash)
+        internal void GetDigestedBytes(ISigner hash)
         {
             _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
-            hash.TransformFinalBlock(new byte[0], 0, 0);
-            byte[] res = (byte[])hash.Hash.Clone();
-            // reinitialize the hash so it is still usable after the call
-            hash.Initialize();
-            return res;
         }
 
         private static void MarkInclusionStateForNodes(XmlNodeList nodeList, XmlDocument inputRoot, XmlDocument root)

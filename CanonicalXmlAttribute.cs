@@ -7,7 +7,6 @@ using System.Xml;
 using System.IO;
 using System.Text;
 using System.Collections;
-using System.Security.Cryptography;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -35,15 +34,15 @@ namespace Org.BouncyCastle.Crypto.Xml
             strBuilder.Append("\"");
         }
 
-        public void WriteHash(HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             UTF8Encoding utf8 = new UTF8Encoding(false);
             byte[] rgbData = utf8.GetBytes(" " + Name + "=\"");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            signer.BlockUpdate(rgbData, 0, rgbData.Length);
             rgbData = utf8.GetBytes(Utils.EscapeAttributeValue(Value));
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            signer.BlockUpdate(rgbData, 0, rgbData.Length);
             rgbData = utf8.GetBytes("\"");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            signer.BlockUpdate(rgbData, 0, rgbData.Length);
         }
     }
 }

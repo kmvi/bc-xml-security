@@ -7,7 +7,6 @@ using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -44,7 +43,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             // XPath transform is specified by text child of first XPath child
             if (nodeList == null)
-                throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
 
             foreach (XmlNode node in nodeList)
             {
@@ -77,7 +76,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
 
             if (_xpathexpr == null)
-                throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
         }
 
         protected override XmlNodeList GetInnerXml()

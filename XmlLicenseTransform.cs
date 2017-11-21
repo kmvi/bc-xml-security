@@ -7,7 +7,6 @@ using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
@@ -83,7 +82,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                                                                 keyInfoObj, toDecrypt);
 
                         if ((decryptedContent == null) || (decryptedContent.Length == 0))
-                            throw new CryptographicException(SR.Cryptography_Xml_XrmlUnableToDecryptGrant);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_XrmlUnableToDecryptGrant);
 
                         streamReader = new StreamReader(decryptedContent);
                         string clearContent = streamReader.ReadToEnd();
@@ -139,7 +138,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             // Check if the Context property is set before this transform is invoked.
             if (Context == null)
-                throw new CryptographicException(SR.Cryptography_Xml_XrmlMissingContext);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_XrmlMissingContext);
 
             _license = new XmlDocument();
             _license.PreserveWhitespace = true;
@@ -155,7 +154,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             // Get the nearest issuer node
             currentIssuerContext = Context.SelectSingleNode("ancestor-or-self::r:issuer[1]", _namespaceManager) as XmlElement;
             if (currentIssuerContext == null)
-                throw new CryptographicException(SR.Cryptography_Xml_XrmlMissingIssuer);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_XrmlMissingIssuer);
 
             signatureNode = currentIssuerContext.SelectSingleNode("descendant-or-self::dsig:Signature[1]", _namespaceManager) as XmlElement;
             if (signatureNode != null)
@@ -164,7 +163,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             // Get the nearest license node
             currentLicenseContext = currentIssuerContext.SelectSingleNode("ancestor-or-self::r:license[1]", _namespaceManager) as XmlElement;
             if (currentLicenseContext == null)
-                throw new CryptographicException(SR.Cryptography_Xml_XrmlMissingLicence);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_XrmlMissingLicence);
 
             XmlNodeList issuerList = currentLicenseContext.SelectNodes("descendant-or-self::r:license[1]/r:issuer", _namespaceManager);
 
@@ -184,7 +183,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (encryptedGrantList.Count > 0)
             {
                 if (_relDecryptor == null)
-                    throw new CryptographicException(SR.Cryptography_Xml_XrmlMissingIRelDecryptor);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_XrmlMissingIRelDecryptor);
 
                 DecryptEncryptedGrants(encryptedGrantList, _relDecryptor);
             }

@@ -6,7 +6,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Xml;
 using System.Globalization;
 using System.Runtime.Versioning;
@@ -23,12 +22,13 @@ namespace Org.BouncyCastle.Crypto.Xml
         private TransformChain _transformChain;
         private string _digestMethod;
         private byte[] _digestValue;
-        private HashAlgorithm _hashAlgorithm;
+        private IDigest _hashAlgorithm;
         private object _refTarget;
         private ReferenceTargetType _refTargetType;
         private XmlElement _cachedXml;
         private SignedXml _signedXml = null;
         internal CanonicalXmlNodeList _namespaces = null;
+        private byte[] _hashval = null;
 
         //
         // public constructors
@@ -191,7 +191,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             // Add the DigestMethod
             if (string.IsNullOrEmpty(_digestMethod))
-                throw new CryptographicException(SR.Cryptography_Xml_DigestMethodRequired);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_DigestMethodRequired);
 
             XmlElement digestMethodElement = document.CreateElement("DigestMethod", SignedXml.XmlDsigNamespaceUrl);
             digestMethodElement.SetAttribute("Algorithm", _digestMethod);
@@ -199,9 +199,9 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             if (DigestValue == null)
             {
-                if (_hashAlgorithm.Hash == null)
-                    throw new CryptographicException(SR.Cryptography_Xml_DigestValueRequired);
-                DigestValue = _hashAlgorithm.Hash;
+                if (_hashval == null)
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_DigestValueRequired);
+                DigestValue = _hashval;
             }
 
             XmlElement digestValueElement = document.CreateElement("DigestValue", SignedXml.XmlDsigNamespaceUrl);
@@ -237,7 +237,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         string algorithm = Utils.GetAttribute(transformElement, "Algorithm", SignedXml.XmlDsigNamespaceUrl);
                         Transform transform = CryptoHelpers.CreateFromName(algorithm) as Transform;
                         if (transform == null)
-                            throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                         AddTransform(transform);
                         // let the transform read the children of the transformElement for data
                         transform.LoadInnerXml(transformElement.ChildNodes);
@@ -269,13 +269,13 @@ namespace Org.BouncyCastle.Crypto.Xml
             // DigestMethod
             XmlElement digestMethodElement = value.SelectSingleNode("ds:DigestMethod", nsm) as XmlElement;
             if (digestMethodElement == null)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidElement, "Reference/DigestMethod");
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "Reference/DigestMethod");
             _digestMethod = Utils.GetAttribute(digestMethodElement, "Algorithm", SignedXml.XmlDsigNamespaceUrl);
 
             // DigestValue
             XmlElement digestValueElement = value.SelectSingleNode("ds:DigestValue", nsm) as XmlElement;
             if (digestValueElement == null)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidElement, "Reference/DigestValue");
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "Reference/DigestValue");
             _digestValue = Convert.FromBase64String(Utils.DiscardWhiteSpaces(digestValueElement.InnerText));
 
             // cache the Xml
@@ -304,9 +304,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             // refList is a list of elements that might be targets of references
             // Now's the time to create our hashing algorithm
-            _hashAlgorithm = CryptoHelpers.CreateFromName(_digestMethod) as HashAlgorithm;
+            _hashAlgorithm = CryptoHelpers.CreateFromName(_digestMethod) as IDigest;
             if (_hashAlgorithm == null)
-                throw new CryptographicException(SR.Cryptography_Xml_CreateHashAlgorithmFailed);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CreateHashAlgorithmFailed);
 
             // Let's go get the target.
             string baseUri = (document == null ? System.Environment.CurrentDirectory + "\\" : document.BaseURI);
@@ -314,7 +314,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             WebResponse response = null;
             Stream inputStream = null;
             XmlResolver resolver = null;
-            byte[] hashval = null;
+            _hashval = null;
 
             try
             {
@@ -342,7 +342,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                             // This is the self-referential case. First, check that we have a document context.
                             // The Enveloped Signature does not discard comments as per spec; those will be omitted during the transform chain process
                             if (document == null)
-                                throw new CryptographicException(string.Format(CultureInfo.CurrentCulture, SR.Cryptography_Xml_SelfReferenceRequiresContext, _uri));
+                                throw new System.Security.Cryptography.CryptographicException(string.Format(CultureInfo.CurrentCulture, SR.Cryptography_Xml_SelfReferenceRequiresContext, _uri));
 
                             // Normalize the containing document
                             resolver = (SignedXml.ResolverSet ? SignedXml._xmlResolver : new XmlSecureResolver(new XmlUrlResolver(), baseUri));
@@ -359,7 +359,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                             {
                                 // This is a self referencial case
                                 if (document == null)
-                                    throw new CryptographicException(string.Format(CultureInfo.CurrentCulture, SR.Cryptography_Xml_SelfReferenceRequiresContext, _uri));
+                                    throw new System.Security.Cryptography.CryptographicException(string.Format(CultureInfo.CurrentCulture, SR.Cryptography_Xml_SelfReferenceRequiresContext, _uri));
 
                                 // We should not discard comments here!!!
                                 resolver = (SignedXml.ResolverSet ? SignedXml._xmlResolver : new XmlSecureResolver(new XmlUrlResolver(), baseUri));
@@ -392,7 +392,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                             }
 
                             if (elem == null)
-                                throw new CryptographicException(SR.Cryptography_Xml_InvalidReference);
+                                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidReference);
 
                             XmlDocument normDocument = Utils.PreProcessElementInput(elem, resolver, baseUri);
                             // Add the propagated attributes
@@ -413,7 +413,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         }
                         else
                         {
-                            throw new CryptographicException(SR.Cryptography_Xml_UriNotResolved, _uri);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotResolved, _uri);
                         }
                         break;
                     case ReferenceTargetType.XmlElement:
@@ -422,12 +422,20 @@ namespace Org.BouncyCastle.Crypto.Xml
                         hashInputStream = TransformChain.TransformToOctetStream(Utils.PreProcessElementInput((XmlElement)_refTarget, resolver, baseUri), resolver, baseUri);
                         break;
                     default:
-                        throw new CryptographicException(SR.Cryptography_Xml_UriNotResolved, _uri);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotResolved, _uri);
                 }
 
                 // Compute the new hash value
                 hashInputStream = SignedXmlDebugLog.LogReferenceData(this, hashInputStream);
-                hashval = _hashAlgorithm.ComputeHash(hashInputStream);
+                // Default the buffer size to 4K.
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                _hashAlgorithm.Reset();
+                while ((bytesRead = hashInputStream.Read(buffer, 0, buffer.Length)) > 0) {
+                    _hashAlgorithm.BlockUpdate(buffer, 0, bytesRead);
+                }
+                _hashval = new byte[_hashAlgorithm.GetDigestSize()];
+                _hashAlgorithm.DoFinal(_hashval, 0);
             }
             finally
             {
@@ -439,7 +447,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     inputStream.Close();
             }
 
-            return hashval;
+            return _hashval;
         }
     }
 }

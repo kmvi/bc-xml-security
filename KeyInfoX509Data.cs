@@ -2,13 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.X509;
 using System;
 using System.Collections;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 
@@ -35,21 +34,21 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public KeyInfoX509Data(byte[] rgbCert)
         {
-            X509Certificate2 certificate = new X509Certificate2(rgbCert);
-            AddCertificate(certificate);
+            var parser = new X509CertificateParser();
+            AddCertificate(parser.ReadCertificate(rgbCert));
         }
 
         public KeyInfoX509Data(X509Certificate cert)
         {
-            AddCertificate(cert);
+            AddCertificate(Utils.CloneCertificate(cert));
         }
 
-        public KeyInfoX509Data(X509Certificate cert, X509IncludeOption includeOption)
+        /*public KeyInfoX509Data(X509Certificate cert, X509IncludeOption includeOption)
         {
             if (cert == null)
                 throw new ArgumentNullException("cert");
 
-            X509Certificate2 certificate = new X509Certificate2(cert);
+            X509Certificate certificate = Utils.CloneCertificate(cert);
             X509ChainElementCollection elements = null;
             X509Chain chain = null;
             switch (includeOption)
@@ -63,7 +62,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     if ((chain.ChainStatus.Length > 0) &&
                         ((chain.ChainStatus[0].Status & X509ChainStatusFlags.PartialChain) == X509ChainStatusFlags.PartialChain))
                     {
-                        throw new CryptographicException(SR.Cryptography_Partial_Chain);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Partial_Chain);
                     }
 
                 elements = (X509ChainElementCollection)chain.ChainElements;
@@ -84,7 +83,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     if ((chain.ChainStatus.Length > 0) &&
                         ((chain.ChainStatus[0].Status & X509ChainStatusFlags.PartialChain) == X509ChainStatusFlags.PartialChain))
                     {
-                        throw new CryptographicException(SR.Cryptography_Partial_Chain);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Partial_Chain);
                     }
 
                     elements = (X509ChainElementCollection)chain.ChainElements;
@@ -94,7 +93,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     }
                     break;
             }
-        }
+        }*/
 
         //
         // public properties
@@ -113,7 +112,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (_certificates == null)
                 _certificates = new ArrayList();
 
-            X509Certificate2 x509 = new X509Certificate2(certificate);
+            X509Certificate x509 = certificate;
             _certificates.Add(x509);
         }
 
@@ -252,7 +251,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 foreach (X509Certificate certificate in _certificates)
                 {
                     XmlElement x509Element = xmlDocument.CreateElement("X509Certificate", SignedXml.XmlDsigNamespaceUrl);
-                    x509Element.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(certificate.GetRawCertData())));
+                    x509Element.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(certificate.GetEncoded())));
                     x509DataElement.AppendChild(x509Element);
                 }
             }
@@ -283,7 +282,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             if ((x509CRLNodes.Count == 0 && x509IssuerSerialNodes.Count == 0 && x509SKINodes.Count == 0
                     && x509SubjectNameNodes.Count == 0 && x509CertificateNodes.Count == 0)) // Bad X509Data tag, or Empty tag
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidElement, "X509Data");
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "X509Data");
 
             // Flush anything in the lists
             Clear();
@@ -296,7 +295,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 XmlNode x509IssuerNameNode = issuerSerialNode.SelectSingleNode("ds:X509IssuerName", nsm);
                 XmlNode x509SerialNumberNode = issuerSerialNode.SelectSingleNode("ds:X509SerialNumber", nsm);
                 if (x509IssuerNameNode == null || x509SerialNumberNode == null)
-                    throw new CryptographicException(SR.Cryptography_Xml_InvalidElement, "IssuerSerial");
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "IssuerSerial");
                 InternalAddIssuerSerial(x509IssuerNameNode.InnerText.Trim(), x509SerialNumberNode.InnerText.Trim());
             }
 
@@ -310,9 +309,11 @@ namespace Org.BouncyCastle.Crypto.Xml
                 AddSubjectName(node.InnerText.Trim());
             }
 
+            var parser = new X509CertificateParser();
             foreach (XmlNode node in x509CertificateNodes)
             {
-                AddCertificate(new X509Certificate2(Convert.FromBase64String(Utils.DiscardWhiteSpaces(node.InnerText))));
+                var cert = Convert.FromBase64String(Utils.DiscardWhiteSpaces(node.InnerText));
+                AddCertificate(parser.ReadCertificate(cert));
             }
         }
     }

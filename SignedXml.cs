@@ -10,11 +10,13 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Permissions;
 using System.Xml;
 using Microsoft.Win32;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Asn1;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -23,10 +25,10 @@ namespace Org.BouncyCastle.Crypto.Xml
         protected Signature m_signature;
         protected string m_strSigningKeyName;
 
-        private AsymmetricAlgorithm _signingKey;
+        private AsymmetricKeyParameter _signingKey;
         private XmlDocument _containingDocument = null;
         private IEnumerator _keyInfoEnum = null;
-        private X509Certificate2Collection _x509Collection = null;
+        private IList<X509Certificate> _x509Collection = null;
         private IEnumerator _x509Enum = null;
 
         private bool[] _refProcessed = null;
@@ -52,7 +54,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private const string XmlDsigMoreHMACRIPEMD160Url = "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160";
 
         // defines the XML encryption processing rules
-        private EncryptedXml _exml = null;
+        //private EncryptedXml _exml = null;
 
         //
         // public constant Url identifiers most frequently used within the XML Signature classes
@@ -162,12 +164,13 @@ namespace Org.BouncyCastle.Crypto.Xml
             get { return _safeCanonicalizationMethods; }
         }
 
-        public AsymmetricAlgorithm SigningKey
+        public AsymmetricKeyParameter SigningKey
         {
             get { return _signingKey; }
             set { _signingKey = value; }
         }
 
+        /*
         public EncryptedXml EncryptedXml
         {
             get
@@ -178,6 +181,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             set { _exml = value; }
         }
+        */
 
         public Signature Signature
         {
@@ -250,17 +254,17 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public bool CheckSignature()
         {
-            AsymmetricAlgorithm signingKey;
+            AsymmetricKeyParameter signingKey;
             return CheckSignatureReturningKey(out signingKey);
         }
 
-        public bool CheckSignatureReturningKey(out AsymmetricAlgorithm signingKey)
+        public bool CheckSignatureReturningKey(out AsymmetricKeyParameter signingKey)
         {
             SignedXmlDebugLog.LogBeginSignatureVerification(this, _context);
 
             signingKey = null;
             bool bRet = false;
-            AsymmetricAlgorithm key = null;
+            AsymmetricKeyParameter key = null;
 
             if (!CheckSignatureFormat())
             {
@@ -281,7 +285,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return bRet;
         }
 
-        public bool CheckSignature(AsymmetricAlgorithm key)
+        public bool CheckSignature(AsymmetricKeyParameter key)
         {
             if (!CheckSignatureFormat())
             {
@@ -305,44 +309,19 @@ namespace Org.BouncyCastle.Crypto.Xml
             return true;
         }
 
-        public bool CheckSignature(KeyedHashAlgorithm macAlg)
-        {
-            if (!CheckSignatureFormat())
-            {
-                return false;
-            }
-
-            if (!CheckSignedInfo(macAlg))
-            {
-                SignedXmlDebugLog.LogVerificationFailure(this, SR.Log_VerificationFailed_SignedInfo);
-                return false;
-            }
-
-            if (!CheckDigestedReferences())
-            {
-                SignedXmlDebugLog.LogVerificationFailure(this, SR.Log_VerificationFailed_References);
-                return false;
-            }
-
-            SignedXmlDebugLog.LogVerificationResult(this, macAlg, true);
-            return true;
-        }
-
-        public bool CheckSignature(X509Certificate2 certificate, bool verifySignatureOnly)
+        public bool CheckSignature(X509Certificate certificate, bool verifySignatureOnly)
         {
             if (!verifySignatureOnly)
             {
                 // Check key usages to make sure it is good for signing.
-                foreach (X509Extension extension in certificate.Extensions)
+                
+                var exts = certificate.CertificateStructure.TbsCertificate.Extensions;
+                foreach (DerObjectIdentifier extension in exts.ExtensionOids)
                 {
-                    if (string.Compare(extension.Oid.Value, "2.5.29.15" /* szOID_KEY_USAGE */, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (extension.Equals(X509Extensions.KeyUsage))
                     {
-                        X509KeyUsageExtension keyUsage = new X509KeyUsageExtension();
-                        keyUsage.CopyFrom(extension);
-                        SignedXmlDebugLog.LogVerifyKeyUsage(this, certificate, keyUsage);
-
-                        bool validKeyUsage = (keyUsage.KeyUsages & X509KeyUsageFlags.DigitalSignature) != 0 ||
-                                             (keyUsage.KeyUsages & X509KeyUsageFlags.NonRepudiation) != 0;
+                        var keyUsage = certificate.GetKeyUsage();
+                        bool validKeyUsage = (keyUsage[0 /* DigitalSignature */] || keyUsage[0 /* NonRepudiation */]);
 
                         if (!validKeyUsage)
                         {
@@ -354,7 +333,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 }
 
                 // Do the chain verification to make sure the certificate is valid.
-                X509Chain chain = new X509Chain();
+                /*X509Chain chain = new X509Chain();
                 chain.ChainPolicy.ExtraStore.AddRange(BuildBagOfCerts());
                 bool chainVerified = chain.Build(certificate);
                 SignedXmlDebugLog.LogVerifyX509Chain(this, chain, certificate);
@@ -363,15 +342,13 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     SignedXmlDebugLog.LogVerificationFailure(this, SR.Log_VerificationFailed_X509Chain);
                     return false;
-                }
+                }*/
             }
 
-            using (AsymmetricAlgorithm publicKey = Utils.GetAnyPublicKey(certificate))
+            AsymmetricKeyParameter publicKey = certificate.GetPublicKey();
+            if (!CheckSignature(publicKey))
             {
-                if (!CheckSignature(publicKey))
-                {
-                    return false;
-                }
+                return false;
             }
 
             SignedXmlDebugLog.LogVerificationResult(this, certificate, true);
@@ -385,19 +362,19 @@ namespace Org.BouncyCastle.Crypto.Xml
             BuildDigestedReferences();
 
             // Load the key
-            AsymmetricAlgorithm key = SigningKey;
+            AsymmetricKeyParameter key = SigningKey;
 
             if (key == null)
-                throw new CryptographicException(SR.Cryptography_Xml_LoadKeyFailed);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_LoadKeyFailed);
 
             // Check the signature algorithm associated with the key so that we can accordingly set the signature method
             if (SignedInfo.SignatureMethod == null)
             {
-                if (key is DSA)
+                if (key is DsaKeyParameters)
                 {
                     SignedInfo.SignatureMethod = XmlDsigDSAUrl;
                 }
-                else if (key is RSA)
+                else if (key is RsaKeyParameters)
                 {
                     // Default to RSA-SHA1
                     if (SignedInfo.SignatureMethod == null)
@@ -405,88 +382,34 @@ namespace Org.BouncyCastle.Crypto.Xml
                 }
                 else
                 {
-                    throw new CryptographicException(SR.Cryptography_Xml_CreatedKeyFailed);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CreatedKeyFailed);
                 }
             }
 
             // See if there is a signature description class defined in the Config file
-            SignatureDescription signatureDescription = CryptoHelpers.CreateFromName(SignedInfo.SignatureMethod) as SignatureDescription;
+            ISigner signatureDescription = CryptoHelpers.CreateFromName(SignedInfo.SignatureMethod) as ISigner;
             if (signatureDescription == null)
-                throw new CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
-            HashAlgorithm hashAlg = signatureDescription.CreateDigest();
-            if (hashAlg == null)
-                throw new CryptographicException(SR.Cryptography_Xml_CreateHashAlgorithmFailed);
-            byte[] hashvalue = GetC14NDigest(hashAlg);
-            AsymmetricSignatureFormatter asymmetricSignatureFormatter = signatureDescription.CreateFormatter(key);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
 
-            SignedXmlDebugLog.LogSigning(this, key, signatureDescription, hashAlg, asymmetricSignatureFormatter);
-            m_signature.SignatureValue = asymmetricSignatureFormatter.CreateSignature(hashAlg);
-        }
+            signatureDescription.Init(true, key);
+            GetC14NDigest(signatureDescription);
 
-        public void ComputeSignature(KeyedHashAlgorithm macAlg)
-        {
-            if (macAlg == null)
-                throw new ArgumentNullException("macAlg");
-
-            HMAC hash = macAlg as HMAC;
-            if (hash == null)
-                throw new CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
-
-            int signatureLength;
-            if (m_signature.SignedInfo.SignatureLength == null)
-                signatureLength = hash.HashSize;
-            else
-                signatureLength = Convert.ToInt32(m_signature.SignedInfo.SignatureLength, null);
-            // signatureLength should be less than hash size
-            if (signatureLength < 0 || signatureLength > hash.HashSize)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength);
-            if (signatureLength % 8 != 0)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength2);
-
-            BuildDigestedReferences();
-            switch (hash.HashName)
-            {
-                case "SHA1":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigHMACSHA1Url;
-                    break;
-                case "SHA256":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA256Url;
-                    break;
-                case "SHA384":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA384Url;
-                    break;
-                case "SHA512":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA512Url;
-                    break;
-                case "MD5":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACMD5Url;
-                    break;
-                case "RIPEMD160":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACRIPEMD160Url;
-                    break;
-                default:
-                    throw new CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
-            }
-
-            byte[] hashValue = GetC14NDigest(hash);
-
-            SignedXmlDebugLog.LogSigning(this, hash);
-            m_signature.SignatureValue = new byte[signatureLength / 8];
-            Buffer.BlockCopy(hashValue, 0, m_signature.SignatureValue, 0, signatureLength / 8);
+            //SignedXmlDebugLog.LogSigning(this, key, signatureDescription, hashAlg, asymmetricSignatureFormatter);
+            m_signature.SignatureValue = signatureDescription.GenerateSignature();
         }
 
         //
         // virtual methods
         //
 
-        protected virtual AsymmetricAlgorithm GetPublicKey()
+        protected virtual AsymmetricKeyParameter GetPublicKey()
         {
             if (KeyInfo == null)
-                throw new CryptographicException(SR.Cryptography_Xml_KeyInfoRequired);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_KeyInfoRequired);
 
             if (_x509Enum != null)
             {
-                AsymmetricAlgorithm key = GetNextCertificatePublicKey();
+                AsymmetricKeyParameter key = GetNextCertificatePublicKey();
                 if (key != null)
                     return key;
             }
@@ -512,7 +435,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     if (_x509Collection.Count > 0)
                     {
                         _x509Enum = _x509Collection.GetEnumerator();
-                        AsymmetricAlgorithm key = GetNextCertificatePublicKey();
+                        AsymmetricKeyParameter key = GetNextCertificatePublicKey();
                         if (key != null)
                             return key;
                     }
@@ -522,9 +445,9 @@ namespace Org.BouncyCastle.Crypto.Xml
             return null;
         }
 
-        private X509Certificate2Collection BuildBagOfCerts()
+        private IList<X509Certificate> BuildBagOfCerts()
         {
-            X509Certificate2Collection collection = new X509Certificate2Collection();
+            var collection = new List<X509Certificate>();
             if (KeyInfo != null)
             {
                 foreach (KeyInfoClause clause in KeyInfo)
@@ -538,13 +461,13 @@ namespace Org.BouncyCastle.Crypto.Xml
             return collection;
         }
 
-        private AsymmetricAlgorithm GetNextCertificatePublicKey()
+        private AsymmetricKeyParameter GetNextCertificatePublicKey()
         {
             while (_x509Enum.MoveNext())
             {
-                X509Certificate2 certificate = (X509Certificate2)_x509Enum.Current;
+                X509Certificate certificate = (X509Certificate)_x509Enum.Current;
                 if (certificate != null)
-                    return Utils.GetAnyPublicKey(certificate);
+                    return certificate.GetPublicKey();
             }
 
             return null;
@@ -597,7 +520,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
                     if (cloneElem2 != null)
                     {
-                        throw new CryptographicException(
+                        throw new System.Security.Cryptography.CryptographicException(
                             SR.Cryptography_Xml_InvalidReference);
                     }
                 }
@@ -621,16 +544,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         //
 
         private bool _bCacheValid = false;
-        private byte[] _digestedSignedInfo = null;
 
         private static bool DefaultSignatureFormatValidator(SignedXml signedXml)
         {
-            // Reject the signature if it uses a truncated HMAC
-            if (signedXml.DoesSignatureUseTruncatedHmac())
-            {
-                return false;
-            }
-
             // Reject the signature if it uses a canonicalization algorithm other than
             // one of the ones explicitly allowed
             if (!signedXml.DoesSignatureUseSafeCanonicalizationMethod())
@@ -640,38 +556,6 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             // Otherwise accept it
             return true;
-        }
-
-        // Validation function to see if the current signature is signed with a truncated HMAC - one which
-        // has a signature length of fewer bits than the whole HMAC output.
-        private bool DoesSignatureUseTruncatedHmac()
-        {
-            // If we're not using the SignatureLength property, then we're not truncating the signature length
-            if (SignedInfo.SignatureLength == null)
-            {
-                return false;
-            }
-
-            // See if we're signed witn an HMAC algorithm
-            HMAC hmac = CryptoHelpers.CreateFromName(SignatureMethod) as HMAC;
-            if (hmac == null)
-            {
-                // We aren't signed with an HMAC algorithm, so we cannot have a truncated HMAC
-                return false;
-            }
-
-            // Figure out how many bits the signature is using
-            int actualSignatureSize = 0;
-            if (!int.TryParse(SignedInfo.SignatureLength, out actualSignatureSize))
-            {
-                // If the value wasn't a valid integer, then we'll conservatively reject it all together
-                return true;
-            }
-
-            // Make sure the full HMAC signature size is the same size that was specified in the XML
-            // signature.  If the actual signature size is not exactly the same as the full HMAC size, then
-            // reject the signature.
-            return actualSignatureSize != hmac.HashSize;
         }
 
         // Validation function to see if the signature uses a canonicalization algorithm from our list
@@ -788,9 +672,9 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        private byte[] GetC14NDigest(HashAlgorithm hash)
+        private void GetC14NDigest(ISigner hash)
         {
-            bool isKeyedHashAlgorithm = hash is KeyedHashAlgorithm;
+            bool isKeyedHashAlgorithm = false;
             if (isKeyedHashAlgorithm || !_bCacheValid || !SignedInfo.CacheValid)
             {
                 string baseUri = (_containingDocument == null ? null : _containingDocument.BaseURI);
@@ -809,11 +693,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                 SignedXmlDebugLog.LogBeginCanonicalization(this, c14nMethodTransform);
                 c14nMethodTransform.LoadInput(doc);
                 SignedXmlDebugLog.LogCanonicalizedOutput(this, c14nMethodTransform);
-                _digestedSignedInfo = c14nMethodTransform.GetDigestedOutput(hash);
+                c14nMethodTransform.GetDigestedOutput(hash);
 
                 _bCacheValid = !isKeyedHashAlgorithm;
             }
-            return _digestedSignedInfo;
         }
 
         private int GetReferenceLevel(int index, ArrayList references)
@@ -848,7 +731,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 return 0;
             }
             // Malformed reference
-            throw new CryptographicException(SR.Cryptography_Xml_InvalidReference);
+            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidReference);
         }
 
         private class ReferenceLevelSortOrder : IComparer
@@ -1010,69 +893,39 @@ namespace Org.BouncyCastle.Crypto.Xml
             return formatValid;
         }
 
-        private bool CheckSignedInfo(AsymmetricAlgorithm key)
+        private bool CheckSignedInfo(AsymmetricKeyParameter key)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
 
             SignedXmlDebugLog.LogBeginCheckSignedInfo(this, m_signature.SignedInfo);
 
-            SignatureDescription signatureDescription = CryptoHelpers.CreateFromName(SignatureMethod) as SignatureDescription;
+            ISigner signatureDescription = CryptoHelpers.CreateFromName(SignatureMethod) as ISigner;
             if (signatureDescription == null)
-                throw new CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
 
             // Let's see if the key corresponds with the SignatureMethod 
-            Type ta = Type.GetType(signatureDescription.KeyAlgorithm);
+            /*Type ta = Type.GetType(signatureDescription.KeyAlgorithm);
             if (!IsKeyTheCorrectAlgorithm(key, ta))
+                return false;*/
+
+            try {
+                signatureDescription.Init(false, key);
+            } catch (Exception) {
                 return false;
+            }
 
-            HashAlgorithm hashAlgorithm = signatureDescription.CreateDigest();
-            if (hashAlgorithm == null)
-                throw new CryptographicException(SR.Cryptography_Xml_CreateHashAlgorithmFailed);
-            byte[] hashval = GetC14NDigest(hashAlgorithm);
+            GetC14NDigest(signatureDescription);
 
-            AsymmetricSignatureDeformatter asymmetricSignatureDeformatter = signatureDescription.CreateDeformatter(key);
-            SignedXmlDebugLog.LogVerifySignedInfo(this,
+            /*SignedXmlDebugLog.LogVerifySignedInfo(this,
                                                   key,
                                                   signatureDescription,
                                                   hashAlgorithm,
                                                   asymmetricSignatureDeformatter,
                                                   hashval,
-                                                  m_signature.SignatureValue);
-            return asymmetricSignatureDeformatter.VerifySignature(hashval, m_signature.SignatureValue);
-        }
+                                                  m_signature.SignatureValue);*/
 
-        private bool CheckSignedInfo(KeyedHashAlgorithm macAlg)
-        {
-            if (macAlg == null)
-                throw new ArgumentNullException("macAlg");
-
-            SignedXmlDebugLog.LogBeginCheckSignedInfo(this, m_signature.SignedInfo);
-
-            int signatureLength;
-            if (m_signature.SignedInfo.SignatureLength == null)
-                signatureLength = macAlg.HashSize;
-            else
-                signatureLength = Convert.ToInt32(m_signature.SignedInfo.SignatureLength, null);
-
-            // signatureLength should be less than hash size
-            if (signatureLength < 0 || signatureLength > macAlg.HashSize)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength);
-            if (signatureLength % 8 != 0)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength2);
-            if (m_signature.SignatureValue == null)
-                throw new CryptographicException(SR.Cryptography_Xml_SignatureValueRequired);
-            if (m_signature.SignatureValue.Length != signatureLength / 8)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength);
-
-            // Calculate the hash
-            byte[] hashValue = GetC14NDigest(macAlg);
-            SignedXmlDebugLog.LogVerifySignedInfo(this, macAlg, hashValue, m_signature.SignatureValue);
-            for (int i = 0; i < m_signature.SignatureValue.Length; i++)
-            {
-                if (m_signature.SignatureValue[i] != hashValue[i]) return false;
-            }
-            return true;
+            return signatureDescription.VerifySignature(m_signature.SignatureValue);
         }
 
         private static XmlElement GetSingleReferenceTarget(XmlDocument document, string idAttributeName, string idValue)
@@ -1102,10 +955,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                 return nodeList[0] as XmlElement;
             }
 
-            throw new CryptographicException(SR.Cryptography_Xml_InvalidReference);
+            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidReference);
         }
 
-        private static bool IsKeyTheCorrectAlgorithm(AsymmetricAlgorithm key, Type expectedType)
+        private static bool IsKeyTheCorrectAlgorithm(AsymmetricKeyParameter key, Type expectedType)
         {
             Type actualType = key.GetType();
 
@@ -1125,7 +978,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             // So, in the absence of a better approach, walk up the parent hierarchy until we find the ancestor that's a direct subclass of
             // AsymmetricAlgorithm and treat that as the algorithm identifier.
             //
-            while (expectedType != null && expectedType.BaseType != typeof(AsymmetricAlgorithm))
+            while (expectedType != null && expectedType.BaseType != typeof(System.Security.Cryptography.AsymmetricAlgorithm))
             {
                 expectedType = expectedType.BaseType;
             }

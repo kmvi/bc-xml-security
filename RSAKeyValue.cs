@@ -2,11 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.Crypto.Parameters;
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 
@@ -14,7 +13,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 {
     public class RSAKeyValue : KeyInfoClause
     {
-        private RSA _key;
+        private RsaKeyParameters _key;
 
         //
         // public constructors
@@ -22,10 +21,10 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public RSAKeyValue()
         {
-            _key = RSA.Create();
+            _key = null;
         }
 
-        public RSAKeyValue(RSA key)
+        public RSAKeyValue(RsaKeyParameters key)
         {
             _key = key;
         }
@@ -34,7 +33,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         // public properties
         //
 
-        public RSA Key
+        public RsaKeyParameters Key
         {
             get { return _key; }
             set { _key = value; }
@@ -67,17 +66,15 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         internal override XmlElement GetXml(XmlDocument xmlDocument)
         {
-            RSAParameters rsaParams = _key.ExportParameters(false);
-
             XmlElement keyValueElement = xmlDocument.CreateElement(KeyValueElementName, SignedXml.XmlDsigNamespaceUrl);
             XmlElement rsaKeyValueElement = xmlDocument.CreateElement(RSAKeyValueElementName, SignedXml.XmlDsigNamespaceUrl);
 
             XmlElement modulusElement = xmlDocument.CreateElement(ModulusElementName, SignedXml.XmlDsigNamespaceUrl);
-            modulusElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(rsaParams.Modulus)));
+            modulusElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Modulus.ToByteArray())));
             rsaKeyValueElement.AppendChild(modulusElement);
 
             XmlElement exponentElement = xmlDocument.CreateElement(ExponentElementName, SignedXml.XmlDsigNamespaceUrl);
-            exponentElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(rsaParams.Exponent)));
+            exponentElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Exponent.ToByteArray())));
             rsaKeyValueElement.AppendChild(exponentElement);
 
             keyValueElement.AppendChild(rsaKeyValueElement);
@@ -109,7 +106,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (value.LocalName != KeyValueElementName
                 || value.NamespaceURI != SignedXml.XmlDsigNamespaceUrl)
             {
-                throw new CryptographicException(String.Format("Root element must be {KeyValueElementName} element in namespace {SignedXml.XmlDsigNamespaceUrl}"));
+                throw new System.Security.Cryptography.CryptographicException(String.Format("Root element must be {KeyValueElementName} element in namespace {SignedXml.XmlDsigNamespaceUrl}"));
             }
 
             const string xmlDsigNamespacePrefix = "dsig";
@@ -119,20 +116,18 @@ namespace Org.BouncyCastle.Crypto.Xml
             XmlNode rsaKeyValueElement = value.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{RSAKeyValueElementName}"), xmlNamespaceManager);
             if (rsaKeyValueElement == null)
             {
-                throw new CryptographicException(String.Format("{KeyValueElementName} must contain child element {RSAKeyValueElementName}"));
+                throw new System.Security.Cryptography.CryptographicException(String.Format("{KeyValueElementName} must contain child element {RSAKeyValueElementName}"));
             }
 
             try
             {
-                Key.ImportParameters(new RSAParameters
-                {
-                    Modulus = Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{ModulusElementName}"), xmlNamespaceManager).InnerText),
-                    Exponent = Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{ExponentElementName}"), xmlNamespaceManager).InnerText)
-                });
+                _key = new RsaKeyParameters(false,
+                    new Math.BigInteger(Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{ModulusElementName}"), xmlNamespaceManager).InnerText)),
+                    new Math.BigInteger(Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{ExponentElementName}"), xmlNamespaceManager).InnerText)));
             }
             catch (Exception ex)
             {
-                throw new CryptographicException(String.Format("An error occurred parsing the {ModulusElementName} and {ExponentElementName} elements"), ex);
+                throw new System.Security.Cryptography.CryptographicException(String.Format("An error occurred parsing the {ModulusElementName} and {ExponentElementName} elements"), ex);
             }
         }
     }
