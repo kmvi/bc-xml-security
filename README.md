@@ -1,9 +1,10 @@
 # bc-signedxml
-XML Signature with Bouncy Castle
+XML Signature using Bouncy Castle
 
 ### TODO
 - [ ] EncryptedXml
-- [x] GOST support
+- [x] GOST 2001 support
+- [ ] GOST 2012 support
 
 ### Example
 
