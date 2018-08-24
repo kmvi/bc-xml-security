@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -63,6 +65,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                 case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411":
                 case "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411":
                     return SignerUtilities.GetSigner("GOST3411WITHECGOST3410");
+                case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012256":
+                    return new Gost3410DigestSigner(new ECGost3410Signer(), new GOST3411_2012_256Digest());
+                case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012512":
+                    return new Gost3410DigestSigner(new ECGost3410Signer(), new GOST3411_2012_512Digest());
 
                 // workarounds for issue https://github.com/dotnet/corefx/issues/16563
                 // remove attribute from this method when removing them
@@ -73,6 +79,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                 case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr3411":
                 case "http://www.w3.org/2001/04/xmldsig-more#gostr3411":
                     return DigestUtilities.GetDigest("GOST3411");
+                case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-256":
+                    return DigestUtilities.GetDigest("GOST3411-2012-256");
+                case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-512":
+                    return DigestUtilities.GetDigest("GOST3411-2012-512");
                 case "http://www.w3.org/2001/04/xmldsig-more#hmac-md5":
                     return MacUtilities.GetMac("HMAC-MD5");
                 case "http://www.w3.org/2001/04/xmlenc#tripledes-cbc":

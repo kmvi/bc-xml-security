@@ -4,7 +4,7 @@ XML Signature using Bouncy Castle
 ### TODO
 - [ ] EncryptedXml
 - [x] GOST 2001 support
-- [ ] GOST 2012 support
+- [x] GOST 2012 support
 
 ### Example
 

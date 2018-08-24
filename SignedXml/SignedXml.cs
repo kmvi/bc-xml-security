@@ -91,12 +91,21 @@ namespace Org.BouncyCastle.Crypto.Xml
         public const string XmlDecryptionTransformUrl = "http://www.w3.org/2002/07/decrypt#XML";
         public const string XmlLicenseTransformUrl = "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform";
 
-        // GOST algorithms
+        // GOST 2001 algorithms
         public const string XmlDsigGost3410Url = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411";
         public const string XmlDsigGost3410ObsoleteUrl = "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411";
         public const string XmlDsigGost3411Url = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr3411";
         public const string XmlDsigGost3411ObsoleteUrl = "http://www.w3.org/2001/04/xmldsig-more#gostr3411";
         public const string XmlDsigGost3411HmacUrl = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:hmac-gostr3411";
+
+        // GOST 2012 algorithms
+        public const string XmlDsigGost3410_2012_256_Url = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012256";
+        public const string XmlDsigGost3411_2012_256_Url = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-256";
+        public const string XmlDsigGost3411_2012_256_HmacUrl = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:hmac-gostr34112012-256";
+
+        public const string XmlDsigGost3410_2012_512_Url = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012512";
+        public const string XmlDsigGost3411_2012_512_Url = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-512";
+        public const string XmlDsigGost3411_2012_512_HmacUrl = "urn:ietf:params:xml:ns:cpxmlsec:algorithms:hmac-gostr34112012-512";
 
         //
         // public constructors
