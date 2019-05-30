@@ -109,10 +109,14 @@ namespace Org.BouncyCastle.Crypto.Xml
         public virtual void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             ReferenceType = value.LocalName;
-            Uri = Utils.GetAttribute(value, "URI", EncryptedXml.XmlEncNamespaceUrl);
+            
+            string uri = Utils.GetAttribute(value, "URI", EncryptedXml.XmlEncNamespaceUrl);
+            if (uri == null)
+                throw new ArgumentNullException(SR.Cryptography_Xml_UriRequired);
+            Uri = uri;
 
             // Transforms
             XmlNamespaceManager nsm = new XmlNamespaceManager(value.OwnerDocument.NameTable);

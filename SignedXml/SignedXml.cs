@@ -70,15 +70,15 @@ namespace Org.BouncyCastle.Crypto.Xml
         public const string XmlDsigRSASHA1Url = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
         public const string XmlDsigHMACSHA1Url = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
 
-        internal const string XmlDsigSHA256Url = "http://www.w3.org/2001/04/xmlenc#sha256";
-        internal const string XmlDsigRSASHA256Url = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        public const string XmlDsigSHA256Url = "http://www.w3.org/2001/04/xmlenc#sha256";
+        public const string XmlDsigRSASHA256Url = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
 
         // Yes, SHA384 is in the xmldsig-more namespace even though all the other SHA variants are in xmlenc. That's the standard.
-        internal const string XmlDsigSHA384Url = "http://www.w3.org/2001/04/xmldsig-more#sha384";
-        internal const string XmlDsigRSASHA384Url = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
+        public const string XmlDsigSHA384Url = "http://www.w3.org/2001/04/xmldsig-more#sha384";
+        public const string XmlDsigRSASHA384Url = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
 
-        internal const string XmlDsigSHA512Url = "http://www.w3.org/2001/04/xmlenc#sha512";
-        internal const string XmlDsigRSASHA512Url = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+        public const string XmlDsigSHA512Url = "http://www.w3.org/2001/04/xmlenc#sha512";
+        public const string XmlDsigRSASHA512Url = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
 
         public const string XmlDsigC14NTransformUrl = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
         public const string XmlDsigC14NWithCommentsTransformUrl = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
@@ -403,7 +403,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
 
             // See if there is a signature description class defined in the Config file
-            ISigner signatureDescription = CryptoHelpers.CreateFromName(SignedInfo.SignatureMethod) as ISigner;
+            ISigner signatureDescription = CryptoHelpers.CreateFromName<ISigner>(SignedInfo.SignatureMethod);
             if (signatureDescription == null)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
 
@@ -560,9 +560,16 @@ namespace Org.BouncyCastle.Crypto.Xml
         //
 
         private bool _bCacheValid = false;
+        //private byte[] _digestedSignedInfo = null;
 
         private static bool DefaultSignatureFormatValidator(SignedXml signedXml)
         {
+            // Reject the signature if it uses a truncated HMAC
+            if (signedXml.DoesSignatureUseTruncatedHmac())
+            {
+                return false;
+            }
+
             // Reject the signature if it uses a canonicalization algorithm other than
             // one of the ones explicitly allowed
             if (!signedXml.DoesSignatureUseSafeCanonicalizationMethod())
@@ -572,6 +579,38 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             // Otherwise accept it
             return true;
+        }
+
+        // Validation function to see if the current signature is signed with a truncated HMAC - one which
+        // has a signature length of fewer bits than the whole HMAC output.
+        private bool DoesSignatureUseTruncatedHmac()
+        {
+            // If we're not using the SignatureLength property, then we're not truncating the signature length
+            if (SignedInfo.SignatureLength == null)
+            {
+                return false;
+            }
+
+            // See if we're signed witn an HMAC algorithm
+            IMac hmac = CryptoHelpers.CreateFromName<IMac>(SignatureMethod);
+            if (hmac == null)
+            {
+                // We aren't signed with an HMAC algorithm, so we cannot have a truncated HMAC
+                return false;
+            }
+
+            // Figure out how many bits the signature is using
+            int actualSignatureSize = 0;
+            if (!int.TryParse(SignedInfo.SignatureLength, out actualSignatureSize))
+            {
+                // If the value wasn't a valid integer, then we'll conservatively reject it all together
+                return true;
+            }
+
+            // Make sure the full HMAC signature size is the same size that was specified in the XML
+            // signature.  If the actual signature size is not exactly the same as the full HMAC size, then
+            // reject the signature.
+            return actualSignatureSize != hmac.GetMacSize();
         }
 
         // Validation function to see if the signature uses a canonicalization algorithm from our list
@@ -916,7 +955,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             SignedXmlDebugLog.LogBeginCheckSignedInfo(this, m_signature.SignedInfo);
 
-            ISigner signatureDescription = CryptoHelpers.CreateFromName(SignatureMethod) as ISigner;
+            ISigner signatureDescription = CryptoHelpers.CreateFromName<ISigner>(SignatureMethod);
             if (signatureDescription == null)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
 

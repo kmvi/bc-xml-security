@@ -166,7 +166,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             if (_issuerSerials == null)
                 _issuerSerials = new ArrayList();
-            _issuerSerials.Add(new X509IssuerSerial(issuerName, h.ToString()));
+            _issuerSerials.Add(Utils.CreateX509IssuerSerial(issuerName, h.ToString()));
         }
 
         // When we load an X509Data from Xml, we know the serial number is in decimal representation.
@@ -174,7 +174,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             if (_issuerSerials == null)
                 _issuerSerials = new ArrayList();
-            _issuerSerials.Add(new X509IssuerSerial(issuerName, serialNumber));
+            _issuerSerials.Add(Utils.CreateX509IssuerSerial(issuerName, serialNumber));
         }
 
         public byte[] CRL

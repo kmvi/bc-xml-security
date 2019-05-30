@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Runtime.Serialization;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -13,17 +14,12 @@ namespace Org.BouncyCastle.Crypto.Xml
     /// hash. ComputeHash can throw different kind of exceptions.
     /// This unique exception helps catch the recursion limit issue.
     /// </summary>
-    internal class CryptoSignedXmlRecursionException : XmlException
+    [Serializable]
+    public class CryptoSignedXmlRecursionException : XmlException
     {
         public CryptoSignedXmlRecursionException() : base() { }
         public CryptoSignedXmlRecursionException(string message) : base(message) { }
-        public CryptoSignedXmlRecursionException(string message, System.Exception inner) : base(message, inner) { }
-        // A constructor is needed for serialization when an 
-        // exception propagates from a remoting server to the client.  
-        protected CryptoSignedXmlRecursionException(System.Runtime.Serialization.SerializationInfo info,
-        System.Runtime.Serialization.StreamingContext context)
-        {
-            throw new PlatformNotSupportedException();
-        }
+        public CryptoSignedXmlRecursionException(string message, Exception inner) : base(message, inner) { }
+        protected CryptoSignedXmlRecursionException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

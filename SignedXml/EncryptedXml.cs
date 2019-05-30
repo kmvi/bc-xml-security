@@ -2,10 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Collections;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using System.Text;
 using System.Xml;
@@ -183,9 +183,8 @@ namespace Org.BouncyCastle.Crypto.Xml
         private byte[] GetCipherValue(CipherData cipherData)
         {
             if (cipherData == null)
-                throw new ArgumentNullException("cipherData");
+                throw new ArgumentNullException(nameof(cipherData));
 
-            WebResponse response = null;
             Stream inputStream = null;
 
             if (cipherData.CipherValue != null)
@@ -197,21 +196,38 @@ namespace Org.BouncyCastle.Crypto.Xml
                 if (cipherData.CipherReference.CipherValue != null)
                     return cipherData.CipherReference.CipherValue;
                 Stream decInputStream = null;
+                if (cipherData.CipherReference.Uri == null)
+                {
+                    throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                }
                 // See if the CipherReference is a local URI
                 if (cipherData.CipherReference.Uri.Length == 0)
                 {
                     // self referenced Uri
                     string baseUri = (_document == null ? null : _document.BaseURI);
                     TransformChain tc = cipherData.CipherReference.TransformChain;
+                    if (tc == null)
+                    {
+                        throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                    }
                     decInputStream = tc.TransformToOctetStream(_document, _xmlResolver, baseUri);
                 }
                 else if (cipherData.CipherReference.Uri[0] == '#')
                 {
                     string idref = Utils.ExtractIdFromLocalUri(cipherData.CipherReference.Uri);
                     // Serialize 
-                    inputStream = new MemoryStream(_encoding.GetBytes(GetIdElement(_document, idref).OuterXml));
+                    XmlElement idElem = GetIdElement(_document, idref);
+                    if (idElem == null || idElem.OuterXml == null)
+                    {
+                        throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                    }
+                    inputStream = new MemoryStream(_encoding.GetBytes(idElem.OuterXml));
                     string baseUri = (_document == null ? null : _document.BaseURI);
                     TransformChain tc = cipherData.CipherReference.TransformChain;
+                    if (tc == null)
+                    {
+                        throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                    }
                     decInputStream = tc.TransformToOctetStream(inputStream, _xmlResolver, baseUri);
                 }
                 else
@@ -225,8 +241,6 @@ namespace Org.BouncyCastle.Crypto.Xml
                     Utils.Pump(decInputStream, ms);
                     cipherValue = ms.ToArray();
                     // Close the stream and return
-                    if (response != null)
-                        response.Close();
                     if (inputStream != null)
                         inputStream.Close();
                     decInputStream.Close();
@@ -255,7 +269,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public virtual byte[] GetDecryptionIV(EncryptedData encryptedData, string symmetricAlgorithmUri)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException("encryptedData");
+                throw new ArgumentNullException(nameof(encryptedData));
 
             int initBytesSize = 0;
             // If the Uri is not provided by the application, try to get it from the EncryptionMethod
@@ -291,7 +305,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public virtual SymmetricAlgorithm GetDecryptionKey(EncryptedData encryptedData, string symmetricAlgorithmUri)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException("encryptedData");
+                throw new ArgumentNullException(nameof(encryptedData));
 
             if (encryptedData.KeyInfo == null)
                 return null;
@@ -361,7 +375,11 @@ namespace Org.BouncyCastle.Crypto.Xml
                 if (key == null)
                     throw new CryptographicException(SR.Cryptography_Xml_MissingDecryptionKey);
 
-                SymmetricAlgorithm symAlg = (SymmetricAlgorithm)CryptoHelpers.CreateFromName(symmetricAlgorithmUri);
+                SymmetricAlgorithm symAlg = CryptoHelpers.CreateFromName<SymmetricAlgorithm>(symmetricAlgorithmUri);
+                if (symAlg == null)
+                {
+                    throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                }
                 symAlg.Key = key;
                 return symAlg;
             }
@@ -372,7 +390,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public virtual byte[] DecryptEncryptedKey(EncryptedKey encryptedKey)
         {
             if (encryptedKey == null)
-                throw new ArgumentNullException("encryptedKey");
+                throw new ArgumentNullException(nameof(encryptedKey));
             if (encryptedKey.KeyInfo == null)
                 return null;
 
@@ -394,6 +412,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                     object kek = _keyNameMapping[keyName];
                     if (kek != null)
                     {
+                        if (encryptedKey.CipherData == null || encryptedKey.CipherData.CipherValue == null)
+                        {
+                            throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                        }
                         // kek is either a SymmetricAlgorithm or an RSA key, otherwise, we wouldn't be able to insert it in the hash table
                         if (kek is SymmetricAlgorithm)
                             return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, (SymmetricAlgorithm)kek);
@@ -414,6 +436,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                         {
                             if (privateKey != null)
                             {
+                                if (encryptedKey.CipherData == null || encryptedKey.CipherData.CipherValue == null)
+                                {
+                                    throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                                }
                                 fOAEP = (encryptedKey.EncryptionMethod != null && encryptedKey.EncryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncRSAOAEPUrl);
                                 return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, privateKey, fOAEP);
                             }
@@ -456,7 +482,16 @@ namespace Org.BouncyCastle.Crypto.Xml
                     if (encryptionKey != null)
                     {
                         // this is a symmetric algorithm for sure
-                        SymmetricAlgorithm symAlg = (SymmetricAlgorithm)CryptoHelpers.CreateFromName(encryptedKey.EncryptionMethod.KeyAlgorithm);
+                        SymmetricAlgorithm symAlg = CryptoHelpers.CreateFromName<SymmetricAlgorithm>(encryptedKey.EncryptionMethod.KeyAlgorithm);
+                        if (symAlg == null)
+                        {
+                            throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                        }
+                        symAlg.Key = encryptionKey;
+                        if (encryptedKey.CipherData == null || encryptedKey.CipherData.CipherValue == null)
+                        {
+                            throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                        }
                         symAlg.Key = encryptionKey;
                         return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, symAlg);
                     }
@@ -474,9 +509,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddKeyNameMapping(string keyName, object keyObject)
         {
             if (keyName == null)
-                throw new ArgumentNullException("keyName");
+                throw new ArgumentNullException(nameof(keyName));
             if (keyObject == null)
-                throw new ArgumentNullException("keyObject");
+                throw new ArgumentNullException(nameof(keyObject));
 
             if (!(keyObject is SymmetricAlgorithm) && !(keyObject is RSA))
                 throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
@@ -493,9 +528,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public EncryptedData Encrypt(XmlElement inputElement, X509Certificate2 certificate)
         {
             if (inputElement == null)
-                throw new ArgumentNullException("inputElement");
+                throw new ArgumentNullException(nameof(inputElement));
             if (certificate == null)
-                throw new ArgumentNullException("certificate");
+                throw new ArgumentNullException(nameof(certificate));
 
             using (RSA rsaPublicKey = certificate.GetRSAPublicKey())
             {
@@ -531,9 +566,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public EncryptedData Encrypt(XmlElement inputElement, string keyName)
         {
             if (inputElement == null)
-                throw new ArgumentNullException("inputElement");
+                throw new ArgumentNullException(nameof(inputElement));
             if (keyName == null)
-                throw new ArgumentNullException("keyName");
+                throw new ArgumentNullException(nameof(keyName));
 
             object encryptionKey = null;
             if (_keyNameMapping != null)
@@ -628,9 +663,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public byte[] EncryptData(byte[] plaintext, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (plaintext == null)
-                throw new ArgumentNullException("plaintext");
+                throw new ArgumentNullException(nameof(plaintext));
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException("symmetricAlgorithm");
+                throw new ArgumentNullException(nameof(symmetricAlgorithm));
 
             // save the original symmetric algorithm
             CipherMode origMode = symmetricAlgorithm.Mode;
@@ -671,9 +706,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public byte[] EncryptData(XmlElement inputElement, SymmetricAlgorithm symmetricAlgorithm, bool content)
         {
             if (inputElement == null)
-                throw new ArgumentNullException("inputElement");
+                throw new ArgumentNullException(nameof(inputElement));
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException("symmetricAlgorithm");
+                throw new ArgumentNullException(nameof(symmetricAlgorithm));
 
             byte[] plainText = (content ? _encoding.GetBytes(inputElement.InnerXml) : _encoding.GetBytes(inputElement.OuterXml));
             return EncryptData(plainText, symmetricAlgorithm);
@@ -683,9 +718,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public byte[] DecryptData(EncryptedData encryptedData, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException("encryptedData");
+                throw new ArgumentNullException(nameof(encryptedData));
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException("symmetricAlgorithm");
+                throw new ArgumentNullException(nameof(symmetricAlgorithm));
 
             // get the cipher value and decrypt
             byte[] cipherValue = GetCipherValue(encryptedData.CipherData);
@@ -730,9 +765,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void ReplaceData(XmlElement inputElement, byte[] decryptedData)
         {
             if (inputElement == null)
-                throw new ArgumentNullException("inputElement");
+                throw new ArgumentNullException(nameof(inputElement));
             if (decryptedData == null)
-                throw new ArgumentNullException("decryptedData");
+                throw new ArgumentNullException(nameof(decryptedData));
 
             XmlNode parent = inputElement.ParentNode;
             if (parent.NodeType == XmlNodeType.Document)
@@ -800,9 +835,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static void ReplaceElement(XmlElement inputElement, EncryptedData encryptedData, bool content)
         {
             if (inputElement == null)
-                throw new ArgumentNullException("inputElement");
+                throw new ArgumentNullException(nameof(inputElement));
             if (encryptedData == null)
-                throw new ArgumentNullException("encryptedData");
+                throw new ArgumentNullException(nameof(encryptedData));
 
             // First, get the XML representation of the EncryptedData object
             XmlElement elemED = encryptedData.GetXml(inputElement.OwnerDocument);
@@ -826,9 +861,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static byte[] EncryptKey(byte[] keyData, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (keyData == null)
-                throw new ArgumentNullException("keyData");
+                throw new ArgumentNullException(nameof(keyData));
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException("symmetricAlgorithm");
+                throw new ArgumentNullException(nameof(symmetricAlgorithm));
 
             if (symmetricAlgorithm is TripleDES)
             {
@@ -850,9 +885,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static byte[] EncryptKey(byte[] keyData, RSA rsa, bool useOAEP)
         {
             if (keyData == null)
-                throw new ArgumentNullException("keyData");
+                throw new ArgumentNullException(nameof(keyData));
             if (rsa == null)
-                throw new ArgumentNullException("rsa");
+                throw new ArgumentNullException(nameof(rsa));
 
             if (useOAEP)
             {
@@ -870,9 +905,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static byte[] DecryptKey(byte[] keyData, SymmetricAlgorithm symmetricAlgorithm)
         {
             if (keyData == null)
-                throw new ArgumentNullException("keyData");
+                throw new ArgumentNullException(nameof(keyData));
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException("symmetricAlgorithm");
+                throw new ArgumentNullException(nameof(symmetricAlgorithm));
 
             if (symmetricAlgorithm is TripleDES)
             {
@@ -885,7 +920,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 return SymmetricKeyWrap.AESKeyWrapDecrypt(symmetricAlgorithm.Key, keyData);
             }
             // throw an exception if the transform is not in the previous categories
-            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
+            throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
         }
 
         // decrypts the supplied data using an RSA key and specifies whether we want to use OAEP 
@@ -893,9 +928,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static byte[] DecryptKey(byte[] keyData, RSA rsa, bool useOAEP)
         {
             if (keyData == null)
-                throw new ArgumentNullException("keyData");
+                throw new ArgumentNullException(nameof(keyData));
             if (rsa == null)
-                throw new ArgumentNullException("rsa");
+                throw new ArgumentNullException(nameof(rsa));
 
             if (useOAEP)
             {

@@ -705,7 +705,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                                                   reference.Id,
                                                   reference.Type,
                                                   reference.DigestMethod,
-                                                  CryptoHelpers.CreateFromName(reference.DigestMethod).GetType().Name);
+                                                  CryptoHelpers.CreateFromKnownName(reference.DigestMethod).GetType().Name);
 
                 WriteLine(signedXml,
                           TraceEventType.Verbose,
@@ -835,7 +835,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                                                   SR.Log_ReferenceHash,
                                                   GetObjectId(reference),
                                                   reference.DigestMethod,
-                                                  CryptoHelpers.CreateFromName(reference.DigestMethod).GetType().Name,
+                                                  CryptoHelpers.CreateFromKnownName(reference.DigestMethod).GetType().Name,
                                                   FormatBytes(actualHash),
                                                   FormatBytes(expectedHash));
 
@@ -1047,7 +1047,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                                                     SR.Log_SignedXmlRecursionLimit,
                                                     GetObjectId(reference),
                                                     reference.DigestMethod,
-                                                    CryptoHelpers.CreateFromName(reference.DigestMethod).GetType().Name);
+                                                    CryptoHelpers.CreateFromKnownName(reference.DigestMethod).GetType().Name);
 
                 WriteLine(signedXml,
                             TraceEventType.Information,

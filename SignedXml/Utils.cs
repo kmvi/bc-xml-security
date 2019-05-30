@@ -83,6 +83,29 @@ namespace Org.BouncyCastle.Crypto.Xml
             return element.HasAttribute(localName) || element.HasAttribute(localName, namespaceURI);
         }
 
+        internal static bool VerifyAttributes(XmlElement element, string expectedAttrName)
+        {
+            return VerifyAttributes(element, expectedAttrName == null ? null : new string[] { expectedAttrName });
+        }
+
+        internal static bool VerifyAttributes(XmlElement element, string[] expectedAttrNames)
+        {
+            foreach (XmlAttribute attr in element.Attributes)
+            {
+                // There are a few Xml Special Attributes that are always allowed on any node. Make sure we allow those here.
+                bool attrIsAllowed = attr.Name == "xmlns" || attr.Name.StartsWith("xmlns:") || attr.Name == "xml:space" || attr.Name == "xml:lang" || attr.Name == "xml:base";
+                int expectedInd = 0;
+                while (!attrIsAllowed && expectedAttrNames != null && expectedInd < expectedAttrNames.Length)
+                {
+                    attrIsAllowed = attr.Name == expectedAttrNames[expectedInd];
+                    expectedInd++;
+                }
+                if (!attrIsAllowed)
+                    return false;
+            }
+            return true;
+        }
+
         internal static bool IsNamespaceNode(XmlNode n)
         {
             return n.NodeType == XmlNodeType.Attribute && (n.Prefix.Equals("xmlns") || (n.Prefix.Length == 0 && n.LocalName.Equals("xmlns")));
@@ -493,8 +516,6 @@ namespace Org.BouncyCastle.Crypto.Xml
             CanonicalXmlNodeList namespaces = new CanonicalXmlNodeList();
             XmlNode ancestorNode = elem;
 
-            if (ancestorNode == null) return null;
-
             bool bDefNamespaceToAdd = true;
 
             while (ancestorNode != null)
@@ -608,6 +629,21 @@ namespace Org.BouncyCastle.Crypto.Xml
             return index + 1;
         }
 
+        // Mimic the behavior of the X509IssuerSerial constructor with null and empty checks
+        internal static X509IssuerSerial CreateX509IssuerSerial(string issuerName, string serialNumber)
+        {
+            if (issuerName == null || issuerName.Length == 0)
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, "issuerName");
+            if (serialNumber == null || serialNumber.Length == 0)
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, "serialNumber");
+
+            return new X509IssuerSerial()
+            {
+                IssuerName = issuerName,
+                SerialNumber = serialNumber
+            };
+        }
+
         internal static IList<X509Certificate> BuildBagOfCerts(KeyInfoX509Data keyInfoX509Data, CertUsageType certUsageType)
         {
             var collection = new List<X509Certificate>();
@@ -622,7 +658,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                             collection.Add(certificate);
                             break;
                         case CertUsageType.Decryption:
-                            decryptionIssuerSerials.Add(new X509IssuerSerial(certificate.IssuerDN.ToString(), certificate.SerialNumber.ToString()));
+                            decryptionIssuerSerials.Add(Utils.CreateX509IssuerSerial(certificate.IssuerDN.ToString(), certificate.SerialNumber.ToString()));
                             break;
                     }
                 }
@@ -760,6 +796,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             return certificate.GetPublicKey();
         }
+
+        internal const int MaxTransformsPerReference = 10;
+        internal const int MaxReferencesPerSignedInfo = 100;
 
         internal static IDigest GetSignerDigest(ISigner signer)
         {

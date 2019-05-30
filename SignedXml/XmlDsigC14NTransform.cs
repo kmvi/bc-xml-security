@@ -42,7 +42,11 @@ namespace Org.BouncyCastle.Crypto.Xml
             get { return _outputTypes; }
         }
 
-        public override void LoadInnerXml(XmlNodeList nodeList) { }
+        public override void LoadInnerXml(XmlNodeList nodeList)
+        {
+            if (nodeList != null && nodeList.Count > 0)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+        }
 
         protected override XmlNodeList GetInnerXml()
         {
