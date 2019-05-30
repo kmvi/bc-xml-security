@@ -1,5 +1,5 @@
 # bc-signedxml
-XML Signature using Bouncy Castle
+XML Signature using Bouncy Castle (adapted from [corefx](https://github.com/dotnet/corefx/tree/master/src/System.Security.Cryptography.Xml) sources)
 
 ### TODO
 - [ ] EncryptedXml
