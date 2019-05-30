@@ -66,9 +66,9 @@ namespace Org.BouncyCastle.Crypto.Xml
                 case "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411":
                     return SignerUtilities.GetSigner("GOST3411WITHECGOST3410");
                 case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012256":
-                    return new Gost3410DigestSigner(new ECGost3410Signer(), new GOST3411_2012_256Digest());
+                    return new Gost3410DigestSigner(new ECGost3410Signer(), new Gost3411_2012_256Digest());
                 case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012512":
-                    return new Gost3410DigestSigner(new ECGost3410Signer(), new GOST3411_2012_512Digest());
+                    return new Gost3410DigestSigner(new ECGost3410Signer(), new Gost3411_2012_512Digest());
 
                 // workarounds for issue https://github.com/dotnet/corefx/issues/16563
                 // remove attribute from this method when removing them
