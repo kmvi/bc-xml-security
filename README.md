@@ -1,10 +1,6 @@
 # bc-signedxml
-XML Signature using Bouncy Castle (adapted from [corefx](https://github.com/dotnet/corefx/tree/master/src/System.Security.Cryptography.Xml) sources)
 
-### TODO
-- [ ] EncryptedXml
-- [x] GOST 2001 support
-- [x] GOST 2012 support
+XML Signature and XML Encryption using Bouncy Castle (adapted from [corefx](https://github.com/dotnet/corefx/tree/master/src/System.Security.Cryptography.Xml) sources)
 
 ### Example
 
