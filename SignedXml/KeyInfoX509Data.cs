@@ -2,11 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.Math;
 using Org.BouncyCastle.X509;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
@@ -34,8 +35,10 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public KeyInfoX509Data(byte[] rgbCert)
         {
-            var parser = new X509CertificateParser();
-            AddCertificate(parser.ReadCertificate(rgbCert));
+            if (rgbCert != null) {
+                var parser = new X509CertificateParser();
+                AddCertificate(parser.ReadCertificate(rgbCert));
+            }
         }
 
         public KeyInfoX509Data(X509Certificate cert)
@@ -43,32 +46,29 @@ namespace Org.BouncyCastle.Crypto.Xml
             AddCertificate(Utils.CloneCertificate(cert));
         }
 
-        /*public KeyInfoX509Data(X509Certificate cert, X509IncludeOption includeOption)
+        public KeyInfoX509Data(X509Certificate cert, IEnumerable<X509Certificate> additional, X509IncludeOption includeOption)
         {
             if (cert == null)
                 throw new ArgumentNullException("cert");
 
             X509Certificate certificate = Utils.CloneCertificate(cert);
-            X509ChainElementCollection elements = null;
-            X509Chain chain = null;
+            IList<X509Certificate> chain = null;
             switch (includeOption)
             {
                 case X509IncludeOption.ExcludeRoot:
                     // Build the certificate chain
-                    chain = new X509Chain();
-                    chain.Build(certificate);
+                    chain = Utils.BuildCertificateChain(cert, additional);
 
                     // Can't honor the option if we only have a partial chain.
-                    if ((chain.ChainStatus.Length > 0) &&
+                    /*if ((chain.ChainStatus.Length > 0) &&
                         ((chain.ChainStatus[0].Status & X509ChainStatusFlags.PartialChain) == X509ChainStatusFlags.PartialChain))
                     {
                         throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Partial_Chain);
-                    }
+                    }*/
 
-                elements = (X509ChainElementCollection)chain.ChainElements;
-                    for (int index = 0; index < (Utils.IsSelfSigned(chain) ? 1 : elements.Count - 1); index++)
+                    for (int index = 0; index < (Utils.IsSelfSigned(chain) ? 1 : chain.Count - 1); index++)
                     {
-                        AddCertificate(elements[index].Certificate);
+                        AddCertificate(chain[index]);
                     }
                     break;
                 case X509IncludeOption.EndCertOnly:
@@ -76,24 +76,22 @@ namespace Org.BouncyCastle.Crypto.Xml
                     break;
                 case X509IncludeOption.WholeChain:
                     // Build the certificate chain
-                    chain = new X509Chain();
-                    chain.Build(certificate);
+                    chain = Utils.BuildCertificateChain(cert, additional);
 
                     // Can't honor the option if we only have a partial chain.
-                    if ((chain.ChainStatus.Length > 0) &&
+                    /*if ((chain.ChainStatus.Length > 0) &&
                         ((chain.ChainStatus[0].Status & X509ChainStatusFlags.PartialChain) == X509ChainStatusFlags.PartialChain))
                     {
                         throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Partial_Chain);
-                    }
+                    }*/
 
-                    elements = (X509ChainElementCollection)chain.ChainElements;
-                    foreach (X509ChainElement element in elements)
+                    foreach (var element in chain)
                     {
-                        AddCertificate(element.Certificate);
+                        AddCertificate(element);
                     }
                     break;
             }
-        }*/
+        }
 
         //
         // public properties
@@ -161,8 +159,11 @@ namespace Org.BouncyCastle.Crypto.Xml
                 throw new ArgumentException(SR.Arg_EmptyOrNullString, "serialNumber");
 
             BigInteger h;
-            if (!BigInteger.TryParse(serialNumber, NumberStyles.AllowHexSpecifier, NumberFormatInfo.CurrentInfo, out h))
+            try {
+                h = new BigInteger(serialNumber);
+            } catch (Exception) {
                 throw new ArgumentException(SR.Cryptography_Xml_InvalidX509IssuerSerialNumber, "serialNumber");
+            }
 
             if (_issuerSerials == null)
                 _issuerSerials = new ArrayList();

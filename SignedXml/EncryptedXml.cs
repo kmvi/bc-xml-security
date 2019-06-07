@@ -2,10 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Paddings;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.X509;
+using System;
 using System.Collections;
 using System.IO;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using System.Text;
 using System.Xml;
@@ -67,8 +72,8 @@ namespace Org.BouncyCastle.Crypto.Xml
         private const int _capacity = 4; // 4 is a reasonable capacity for
                                           // the key name mapping hash table
         private Hashtable _keyNameMapping;
-        private PaddingMode _padding;
-        private CipherMode _mode;
+        private string _padding;
+        private string _mode;
         private Encoding _encoding;
         private string _recipient;
         private int _xmlDsigSearchDepthCounter = 0;
@@ -87,9 +92,9 @@ namespace Org.BouncyCastle.Crypto.Xml
             _evidence = evidence;
             _xmlResolver = null;
             // set the default padding to ISO-10126
-            _padding = PaddingMode.ISO10126;
+            _padding = "ISO10126PADDING";
             // set the default cipher mode to CBC
-            _mode = CipherMode.CBC;
+            _mode = "CBC";
             // By default the encoding is going to be UTF8
             _encoding = Encoding.UTF8;
             _keyNameMapping = new Hashtable(_capacity);
@@ -141,7 +146,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         // The padding to be used. XML Encryption uses ISO 10126
         // but it's nice to provide a way to extend this to include other forms of paddings
-        public PaddingMode Padding
+        public string Padding
         {
             get { return _padding; }
             set { _padding = value; }
@@ -149,7 +154,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         // The cipher mode to be used. XML Encryption uses CBC padding
         // but it's nice to provide a way to extend this to include other cipher modes
-        public CipherMode Mode
+        public string Mode
         {
             get { return _mode; }
             set { _mode = value; }
@@ -183,7 +188,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private byte[] GetCipherValue(CipherData cipherData)
         {
             if (cipherData == null)
-                throw new ArgumentNullException(nameof(cipherData));
+                throw new ArgumentNullException("cipherData");
 
             Stream inputStream = null;
 
@@ -198,7 +203,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 Stream decInputStream = null;
                 if (cipherData.CipherReference.Uri == null)
                 {
-                    throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotSupported);
                 }
                 // See if the CipherReference is a local URI
                 if (cipherData.CipherReference.Uri.Length == 0)
@@ -208,7 +213,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     TransformChain tc = cipherData.CipherReference.TransformChain;
                     if (tc == null)
                     {
-                        throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotSupported);
                     }
                     decInputStream = tc.TransformToOctetStream(_document, _xmlResolver, baseUri);
                 }
@@ -219,20 +224,20 @@ namespace Org.BouncyCastle.Crypto.Xml
                     XmlElement idElem = GetIdElement(_document, idref);
                     if (idElem == null || idElem.OuterXml == null)
                     {
-                        throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotSupported);
                     }
                     inputStream = new MemoryStream(_encoding.GetBytes(idElem.OuterXml));
                     string baseUri = (_document == null ? null : _document.BaseURI);
                     TransformChain tc = cipherData.CipherReference.TransformChain;
                     if (tc == null)
                     {
-                        throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotSupported);
                     }
                     decInputStream = tc.TransformToOctetStream(inputStream, _xmlResolver, baseUri);
                 }
                 else
                 {
-                    throw new CryptographicException(SR.Cryptography_Xml_UriNotResolved, cipherData.CipherReference.Uri);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotResolved, cipherData.CipherReference.Uri);
                 }
                 // read the output stream into a memory stream
                 byte[] cipherValue = null;
@@ -252,7 +257,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
 
             // Throw a CryptographicException if we were unable to retrieve the cipher data.
-            throw new CryptographicException(SR.Cryptography_Xml_MissingCipherData);
+            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingCipherData);
         }
 
         //
@@ -269,14 +274,14 @@ namespace Org.BouncyCastle.Crypto.Xml
         public virtual byte[] GetDecryptionIV(EncryptedData encryptedData, string symmetricAlgorithmUri)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
 
             int initBytesSize = 0;
             // If the Uri is not provided by the application, try to get it from the EncryptionMethod
             if (symmetricAlgorithmUri == null)
             {
                 if (encryptedData.EncryptionMethod == null)
-                    throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
                 symmetricAlgorithmUri = encryptedData.EncryptionMethod.KeyAlgorithm;
             }
             switch (symmetricAlgorithmUri)
@@ -292,7 +297,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     break;
                 default:
                     // The Uri is not supported.
-                    throw new CryptographicException(SR.Cryptography_Xml_UriNotSupported);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriNotSupported);
             }
             byte[] IV = new byte[initBytesSize];
             byte[] cipherValue = GetCipherValue(encryptedData.CipherData);
@@ -302,10 +307,10 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         // default behaviour is to look for keys defined by an EncryptedKey clause
         // either directly or through a KeyInfoRetrievalMethod, and key names in the key mapping
-        public virtual SymmetricAlgorithm GetDecryptionKey(EncryptedData encryptedData, string symmetricAlgorithmUri)
+        public virtual ICipherParameters GetDecryptionKey(EncryptedData encryptedData, string symmetricAlgorithmUri)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
 
             if (encryptedData.KeyInfo == null)
                 return null;
@@ -322,8 +327,8 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     // Get the decryption key from the key mapping
                     string keyName = kiName.Value;
-                    if ((SymmetricAlgorithm)_keyNameMapping[keyName] != null)
-                        return (SymmetricAlgorithm)_keyNameMapping[keyName];
+                    if (_keyNameMapping[keyName] as ICipherParameters != null)
+                        return (ICipherParameters)_keyNameMapping[keyName];
                     // try to get it from a CarriedKeyName
                     XmlNamespaceManager nsm = new XmlNamespaceManager(_document.NameTable);
                     nsm.AddNamespace("enc", EncryptedXml.XmlEncNamespaceUrl);
@@ -368,29 +373,28 @@ namespace Org.BouncyCastle.Crypto.Xml
                 if (symmetricAlgorithmUri == null)
                 {
                     if (encryptedData.EncryptionMethod == null)
-                        throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
                     symmetricAlgorithmUri = encryptedData.EncryptionMethod.KeyAlgorithm;
                 }
                 byte[] key = DecryptEncryptedKey(ek);
                 if (key == null)
-                    throw new CryptographicException(SR.Cryptography_Xml_MissingDecryptionKey);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingDecryptionKey);
 
-                SymmetricAlgorithm symAlg = CryptoHelpers.CreateFromName<SymmetricAlgorithm>(symmetricAlgorithmUri);
+                IBufferedCipher symAlg = CryptoHelpers.CreateFromName<IBufferedCipher>(symmetricAlgorithmUri);
                 if (symAlg == null)
                 {
-                    throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
                 }
-                symAlg.Key = key;
-                return symAlg;
+                return new KeyParameter(key);
             }
             return null;
         }
 
         // Try to decrypt the EncryptedKey given the key mapping
-        public virtual byte[] DecryptEncryptedKey(EncryptedKey encryptedKey)
+        public virtual byte[] DecryptEncryptedKey(EncryptedKey encryptedKey, RsaKeyParameters privateKey = null)
         {
             if (encryptedKey == null)
-                throw new ArgumentNullException(nameof(encryptedKey));
+                throw new ArgumentNullException("encryptedKey");
             if (encryptedKey.KeyInfo == null)
                 return null;
 
@@ -414,35 +418,34 @@ namespace Org.BouncyCastle.Crypto.Xml
                     {
                         if (encryptedKey.CipherData == null || encryptedKey.CipherData.CipherValue == null)
                         {
-                            throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
                         }
                         // kek is either a SymmetricAlgorithm or an RSA key, otherwise, we wouldn't be able to insert it in the hash table
-                        if (kek is SymmetricAlgorithm)
-                            return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, (SymmetricAlgorithm)kek);
+                        if (kek is KeyParameter kp)
+                            return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, kp);
+                        else if (kek is ParametersWithIV piv)
+                            return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, piv.Parameters as KeyParameter);
 
                         // kek is an RSA key: get fOAEP from the algorithm, default to false
                         fOAEP = (encryptedKey.EncryptionMethod != null && encryptedKey.EncryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncRSAOAEPUrl);
-                        return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, (RSA)kek, fOAEP);
+                        return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, (RsaKeyParameters)kek, fOAEP);
                     }
                     break;
                 }
                 kiX509Data = keyInfoEnum.Current as KeyInfoX509Data;
                 if (kiX509Data != null)
                 {
-                    X509Certificate2Collection collection = Utils.BuildBagOfCerts(kiX509Data, CertUsageType.Decryption);
-                    foreach (X509Certificate2 certificate in collection)
+                    var collection = Utils.BuildBagOfCerts(kiX509Data, CertUsageType.Decryption);
+                    foreach (X509Certificate certificate in collection)
                     {
-                        using (RSA privateKey = certificate.GetRSAPrivateKey())
+                        if (privateKey != null)
                         {
-                            if (privateKey != null)
+                            if (encryptedKey.CipherData == null || encryptedKey.CipherData.CipherValue == null)
                             {
-                                if (encryptedKey.CipherData == null || encryptedKey.CipherData.CipherValue == null)
-                                {
-                                    throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
-                                }
-                                fOAEP = (encryptedKey.EncryptionMethod != null && encryptedKey.EncryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncRSAOAEPUrl);
-                                return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, privateKey, fOAEP);
+                                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
                             }
+                            fOAEP = (encryptedKey.EncryptionMethod != null && encryptedKey.EncryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncRSAOAEPUrl);
+                            return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, privateKey, fOAEP);
                         }
                     }
                     break;
@@ -465,7 +468,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         }
                         else
                         {
-                            return DecryptEncryptedKey(ek);
+                            return DecryptEncryptedKey(ek, privateKey);
                         }
                     }
                     finally
@@ -478,22 +481,24 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     ek = kiEncKey.EncryptedKey;
                     // recursively process EncryptedKey elements
-                    byte[] encryptionKey = DecryptEncryptedKey(ek);
+                    byte[] encryptionKey = DecryptEncryptedKey(ek, privateKey);
                     if (encryptionKey != null)
                     {
                         // this is a symmetric algorithm for sure
-                        SymmetricAlgorithm symAlg = CryptoHelpers.CreateFromName<SymmetricAlgorithm>(encryptedKey.EncryptionMethod.KeyAlgorithm);
-                        if (symAlg == null)
+                        IBlockCipher blockSymAlg = CryptoHelpers.CreateFromName<IBlockCipher>(encryptedKey.EncryptionMethod.KeyAlgorithm);
+                        if (blockSymAlg == null)
                         {
-                            throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                            IBufferedCipher bufferedSymAlg = CryptoHelpers.CreateFromName<IBufferedCipher>(encryptedKey.EncryptionMethod.KeyAlgorithm);
+                            if (bufferedSymAlg == null)
+                            {
+                                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                            }
                         }
-                        symAlg.Key = encryptionKey;
                         if (encryptedKey.CipherData == null || encryptedKey.CipherData.CipherValue == null)
                         {
-                            throw new CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
                         }
-                        symAlg.Key = encryptionKey;
-                        return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, symAlg);
+                        return EncryptedXml.DecryptKey(encryptedKey.CipherData.CipherValue, new KeyParameter(encryptionKey));
                     }
                 }
             }
@@ -509,12 +514,13 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddKeyNameMapping(string keyName, object keyObject)
         {
             if (keyName == null)
-                throw new ArgumentNullException(nameof(keyName));
+                throw new ArgumentNullException("keyName");
             if (keyObject == null)
-                throw new ArgumentNullException(nameof(keyObject));
+                throw new ArgumentNullException("keyObject");
 
-            if (!(keyObject is SymmetricAlgorithm) && !(keyObject is RSA))
-                throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
+            if (!(keyObject is RsaKeyParameters) && !(keyObject is ICipherParameters))
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
+
             _keyNameMapping.Add(keyName, keyObject);
         }
 
@@ -525,39 +531,39 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         // Encrypts the given element with the certificate specified. The certificate is added as
         // an X509Data KeyInfo to an EncryptedKey (AES session key) generated randomly.
-        public EncryptedData Encrypt(XmlElement inputElement, X509Certificate2 certificate)
+        public EncryptedData Encrypt(XmlElement inputElement, X509Certificate certificate)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (certificate == null)
-                throw new ArgumentNullException(nameof(certificate));
+                throw new ArgumentNullException("certificate");
 
-            using (RSA rsaPublicKey = certificate.GetRSAPublicKey())
-            {
-                if (rsaPublicKey == null)
-                    throw new NotSupportedException(SR.NotSupported_KeyAlgorithm);
+            AsymmetricKeyParameter rsaPublicKey = certificate.GetPublicKey();
+            if (rsaPublicKey == null || !(rsaPublicKey is RsaKeyParameters))
+                throw new NotSupportedException(SR.NotSupported_KeyAlgorithm);
 
-                // Create the EncryptedData object, using an AES-256 session key by default.
-                EncryptedData ed = new EncryptedData();
-                ed.Type = EncryptedXml.XmlEncElementUrl;
-                ed.EncryptionMethod = new EncryptionMethod(EncryptedXml.XmlEncAES256Url);
+            // Create the EncryptedData object, using an AES-256 session key by default.
+            EncryptedData ed = new EncryptedData();
+            ed.Type = EncryptedXml.XmlEncElementUrl;
+            ed.EncryptionMethod = new EncryptionMethod(EncryptedXml.XmlEncAES256Url);
 
-                // Include the certificate in the EncryptedKey KeyInfo.
-                EncryptedKey ek = new EncryptedKey();
-                ek.EncryptionMethod = new EncryptionMethod(EncryptedXml.XmlEncRSA15Url);
-                ek.KeyInfo.AddClause(new KeyInfoX509Data(certificate));
+            // Include the certificate in the EncryptedKey KeyInfo.
+            EncryptedKey ek = new EncryptedKey();
+            ek.EncryptionMethod = new EncryptionMethod(EncryptedXml.XmlEncRSA15Url);
+            ek.KeyInfo.AddClause(new KeyInfoX509Data(certificate));
 
-                // Create a random AES session key and encrypt it with the public key associated with the certificate.
-                RijndaelManaged rijn = new RijndaelManaged();
-                ek.CipherData.CipherValue = EncryptedXml.EncryptKey(rijn.Key, rsaPublicKey, false);
+            // Create a random AES session key and encrypt it with the public key associated with the certificate.
+            IBufferedCipher rijn = CipherUtilities.GetCipher("RIJNDAEL/CBC/PKCS7");
+            KeyParameter keyParam = new KeyParameter(Utils.GenerateRandomBlock(rijn.GetBlockSize()));
+            ParametersWithIV rijnKey = new ParametersWithIV(keyParam, Utils.GenerateRandomBlock(rijn.GetBlockSize()));
+            ek.CipherData.CipherValue = EncryptedXml.EncryptKey(keyParam.GetKey(), (RsaKeyParameters)rsaPublicKey, false);
 
-                // Encrypt the input element with the random session key that we've created above.
-                KeyInfoEncryptedKey kek = new KeyInfoEncryptedKey(ek);
-                ed.KeyInfo.AddClause(kek);
-                ed.CipherData.CipherValue = EncryptData(inputElement, rijn, false);
+            // Encrypt the input element with the random session key that we've created above.
+            KeyInfoEncryptedKey kek = new KeyInfoEncryptedKey(ek);
+            ed.KeyInfo.AddClause(kek);
+            ed.CipherData.CipherValue = EncryptData(inputElement, rijnKey, false);
 
-                return ed;
-            }
+            return ed;
         }
 
         // Encrypts the given element with the key name specified. A corresponding key name mapping 
@@ -566,20 +572,21 @@ namespace Org.BouncyCastle.Crypto.Xml
         public EncryptedData Encrypt(XmlElement inputElement, string keyName)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (keyName == null)
-                throw new ArgumentNullException(nameof(keyName));
+                throw new ArgumentNullException("keyName");
 
             object encryptionKey = null;
             if (_keyNameMapping != null)
                 encryptionKey = _keyNameMapping[keyName];
 
             if (encryptionKey == null)
-                throw new CryptographicException(SR.Cryptography_Xml_MissingEncryptionKey);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingEncryptionKey);
 
             // kek is either a SymmetricAlgorithm or an RSA key, otherwise, we wouldn't be able to insert it in the hash table
-            SymmetricAlgorithm symKey = encryptionKey as SymmetricAlgorithm;
-            RSA rsa = encryptionKey as RSA;
+            ParametersWithIV iv = encryptionKey as ParametersWithIV;
+            KeyParameter symKey = encryptionKey as KeyParameter;
+            RsaKeyParameters rsa = encryptionKey as RsaKeyParameters;
 
             // Create the EncryptedData object, using an AES-256 session key by default.
             EncryptedData ed = new EncryptedData();
@@ -588,43 +595,49 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             // Include the key name in the EncryptedKey KeyInfo.
             string encryptionMethod = null;
-            if (symKey == null)
+            if (symKey == null && iv == null)
             {
                 encryptionMethod = EncryptedXml.XmlEncRSA15Url;
             }
-            else if (symKey is TripleDES)
+            else if (iv != null)
             {
-                // CMS Triple DES Key Wrap
-                encryptionMethod = EncryptedXml.XmlEncTripleDESKeyWrapUrl;
+                symKey = iv.Parameters as KeyParameter;
             }
-            else if (symKey is Rijndael || symKey is Aes)
+
+            if (symKey != null)
             {
-                // FIPS AES Key Wrap
-                switch (symKey.KeySize)
+                if (symKey is DesParameters)
                 {
-                    case 128:
-                        encryptionMethod = EncryptedXml.XmlEncAES128KeyWrapUrl;
-                        break;
-                    case 192:
-                        encryptionMethod = EncryptedXml.XmlEncAES192KeyWrapUrl;
-                        break;
-                    case 256:
-                        encryptionMethod = EncryptedXml.XmlEncAES256KeyWrapUrl;
-                        break;
+                    // CMS Triple DES Key Wrap
+                    encryptionMethod = EncryptedXml.XmlEncTripleDESKeyWrapUrl;
+                }
+                else
+                {
+                    // FIPS AES Key Wrap
+                    switch (symKey.GetKey().Length * 8)
+                    {
+                        case 128:
+                            encryptionMethod = EncryptedXml.XmlEncAES128KeyWrapUrl;
+                            break;
+                        case 192:
+                            encryptionMethod = EncryptedXml.XmlEncAES192KeyWrapUrl;
+                            break;
+                        case 256:
+                            encryptionMethod = EncryptedXml.XmlEncAES256KeyWrapUrl;
+                            break;
+                    }
                 }
             }
-            else
-            {
-                // throw an exception if the transform is not in the previous categories
-                throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
-            }
+
             EncryptedKey ek = new EncryptedKey();
             ek.EncryptionMethod = new EncryptionMethod(encryptionMethod);
             ek.KeyInfo.AddClause(new KeyInfoName(keyName));
 
             // Create a random AES session key and encrypt it with the public key associated with the certificate.
-            RijndaelManaged rijn = new RijndaelManaged();
-            ek.CipherData.CipherValue = (symKey == null ? EncryptedXml.EncryptKey(rijn.Key, rsa, false) : EncryptedXml.EncryptKey(rijn.Key, symKey));
+            var keydata = Utils.GenerateRandomBlock(256 / 8);
+            var ivdata = Utils.GenerateRandomBlock(128 / 8);
+            var rijn = new ParametersWithIV(new KeyParameter(keydata), ivdata);
+            ek.CipherData.CipherValue = (symKey == null ? EncryptedXml.EncryptKey(keydata, rsa, false) : EncryptedXml.EncryptKey(keydata, symKey));
 
             // Encrypt the input element with the random session key that we've created above.
             KeyInfoEncryptedKey kek = new KeyInfoEncryptedKey(ek);
@@ -650,9 +663,9 @@ namespace Org.BouncyCastle.Crypto.Xml
                     XmlElement encryptedDataElement = encryptedDataNode as XmlElement;
                     EncryptedData ed = new EncryptedData();
                     ed.LoadXml(encryptedDataElement);
-                    SymmetricAlgorithm symAlg = GetDecryptionKey(ed, null);
+                    ICipherParameters symAlg = GetDecryptionKey(ed, null);
                     if (symAlg == null)
-                        throw new CryptographicException(SR.Cryptography_Xml_MissingDecryptionKey);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingDecryptionKey);
                     byte[] decrypted = DecryptData(ed, symAlg);
                     ReplaceData(encryptedDataElement, decrypted);
                 }
@@ -660,41 +673,26 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
 
         // encrypts the supplied arbitrary data
-        public byte[] EncryptData(byte[] plaintext, SymmetricAlgorithm symmetricAlgorithm)
+        public byte[] EncryptData(byte[] plaintext, ICipherParameters symmetricAlgorithm)
         {
             if (plaintext == null)
-                throw new ArgumentNullException(nameof(plaintext));
+                throw new ArgumentNullException("plaintext");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
-
-            // save the original symmetric algorithm
-            CipherMode origMode = symmetricAlgorithm.Mode;
-            PaddingMode origPadding = symmetricAlgorithm.Padding;
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             byte[] cipher = null;
-            try
-            {
-                symmetricAlgorithm.Mode = _mode;
-                symmetricAlgorithm.Padding = _padding;
-
-                ICryptoTransform enc = symmetricAlgorithm.CreateEncryptor();
-                cipher = enc.TransformFinalBlock(plaintext, 0, plaintext.Length);
-            }
-            finally
-            {
-                // now restore the original symmetric algorithm
-                symmetricAlgorithm.Mode = origMode;
-                symmetricAlgorithm.Padding = origPadding;
-            }
+            IBufferedCipher enc = CipherUtilities.GetCipher($"Rijndael/{_mode}/{_padding}");
+            enc.Init(true, symmetricAlgorithm);
+            cipher = enc.DoFinal(plaintext);
 
             byte[] output = null;
-            if (_mode == CipherMode.ECB)
+            if (_mode.Equals("ECB", StringComparison.OrdinalIgnoreCase))
             {
                 output = cipher;
             }
             else
             {
-                byte[] IV = symmetricAlgorithm.IV;
+                byte[] IV = ((ParametersWithIV)symmetricAlgorithm).GetIV();
                 output = new byte[cipher.Length + IV.Length];
                 Buffer.BlockCopy(IV, 0, output, 0, IV.Length);
                 Buffer.BlockCopy(cipher, 0, output, IV.Length, cipher.Length);
@@ -703,60 +701,49 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
 
         // encrypts the supplied input element
-        public byte[] EncryptData(XmlElement inputElement, SymmetricAlgorithm symmetricAlgorithm, bool content)
+        public byte[] EncryptData(XmlElement inputElement, ICipherParameters symmetricAlgorithm, bool content)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             byte[] plainText = (content ? _encoding.GetBytes(inputElement.InnerXml) : _encoding.GetBytes(inputElement.OuterXml));
             return EncryptData(plainText, symmetricAlgorithm);
         }
 
         // decrypts the supplied EncryptedData
-        public byte[] DecryptData(EncryptedData encryptedData, SymmetricAlgorithm symmetricAlgorithm)
+        public byte[] DecryptData(EncryptedData encryptedData, ICipherParameters symmetricAlgorithm)
         {
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
             // get the cipher value and decrypt
             byte[] cipherValue = GetCipherValue(encryptedData.CipherData);
 
-            // save the original symmetric algorithm
-            CipherMode origMode = symmetricAlgorithm.Mode;
-            PaddingMode origPadding = symmetricAlgorithm.Padding;
-            byte[] origIV = symmetricAlgorithm.IV;
-
             // read the IV from cipherValue
             byte[] decryptionIV = null;
-            if (_mode != CipherMode.ECB)
+            if (!_mode.Equals("ECB", StringComparison.OrdinalIgnoreCase))
                 decryptionIV = GetDecryptionIV(encryptedData, null);
 
             byte[] output = null;
-            try
+            int lengthIV = 0;
+            if (decryptionIV != null)
             {
-                int lengthIV = 0;
-                if (decryptionIV != null)
-                {
-                    symmetricAlgorithm.IV = decryptionIV;
-                    lengthIV = decryptionIV.Length;
-                }
-                symmetricAlgorithm.Mode = _mode;
-                symmetricAlgorithm.Padding = _padding;
+                KeyParameter keyParam = null;
+                if (symmetricAlgorithm is ParametersWithIV prmIV)
+                    keyParam = (KeyParameter)prmIV.Parameters;
+                else
+                    keyParam = (KeyParameter)symmetricAlgorithm;
+                symmetricAlgorithm = new ParametersWithIV(keyParam, decryptionIV);
+                lengthIV = decryptionIV.Length;
+            }
 
-                ICryptoTransform dec = symmetricAlgorithm.CreateDecryptor();
-                output = dec.TransformFinalBlock(cipherValue, lengthIV, cipherValue.Length - lengthIV);
-            }
-            finally
-            {
-                // now restore the original symmetric algorithm
-                symmetricAlgorithm.Mode = origMode;
-                symmetricAlgorithm.Padding = origPadding;
-                symmetricAlgorithm.IV = origIV;
-            }
+            var dec = CipherUtilities.GetCipher($"Rijndael/{_mode}/{_padding}");
+            dec.Init(false, symmetricAlgorithm);
+            output = dec.DoFinal(cipherValue, lengthIV, cipherValue.Length - lengthIV);
 
             return output;
         }
@@ -765,9 +752,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void ReplaceData(XmlElement inputElement, byte[] decryptedData)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (decryptedData == null)
-                throw new ArgumentNullException(nameof(decryptedData));
+                throw new ArgumentNullException("decryptedData");
 
             XmlNode parent = inputElement.ParentNode;
             if (parent.NodeType == XmlNodeType.Document)
@@ -835,9 +822,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static void ReplaceElement(XmlElement inputElement, EncryptedData encryptedData, bool content)
         {
             if (inputElement == null)
-                throw new ArgumentNullException(nameof(inputElement));
+                throw new ArgumentNullException("inputElement");
             if (encryptedData == null)
-                throw new ArgumentNullException(nameof(encryptedData));
+                throw new ArgumentNullException("encryptedData");
 
             // First, get the XML representation of the EncryptedData object
             XmlElement elemED = encryptedData.GetXml(inputElement.OwnerDocument);
@@ -858,36 +845,34 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
 
         // wraps the supplied input key data using the provided symmetric algorithm
-        public static byte[] EncryptKey(byte[] keyData, SymmetricAlgorithm symmetricAlgorithm)
+        public static byte[] EncryptKey(byte[] keyData, KeyParameter symmetricAlgorithm)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
-            if (symmetricAlgorithm is TripleDES)
+            if (symmetricAlgorithm is DesParameters)
             {
                 // CMS Triple DES Key Wrap
-                return SymmetricKeyWrap.TripleDESKeyWrapEncrypt(symmetricAlgorithm.Key, keyData);
+                return SymmetricKeyWrap.TripleDESKeyWrapEncrypt(symmetricAlgorithm.GetKey(), keyData);
             }
-            else if (symmetricAlgorithm is Rijndael || symmetricAlgorithm is Aes)
+            else
             {
                 // FIPS AES Key Wrap
-                return SymmetricKeyWrap.AESKeyWrapEncrypt(symmetricAlgorithm.Key, keyData);
+                return SymmetricKeyWrap.AESKeyWrapEncrypt(symmetricAlgorithm.GetKey(), keyData);
             }
-            // throw an exception if the transform is not in the previous categories
-            throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
         }
 
 
         // encrypts the supplied input key data using an RSA key and specifies whether we want to use OAEP 
         // padding or PKCS#1 v1.5 padding as described in the PKCS specification
-        public static byte[] EncryptKey(byte[] keyData, RSA rsa, bool useOAEP)
+        public static byte[] EncryptKey(byte[] keyData, RsaKeyParameters rsa, bool useOAEP)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (rsa == null)
-                throw new ArgumentNullException(nameof(rsa));
+                throw new ArgumentNullException("rsa");
 
             if (useOAEP)
             {
@@ -902,35 +887,33 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
 
         // decrypts the supplied wrapped key using the provided symmetric algorithm
-        public static byte[] DecryptKey(byte[] keyData, SymmetricAlgorithm symmetricAlgorithm)
+        public static byte[] DecryptKey(byte[] keyData, KeyParameter symmetricAlgorithm)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (symmetricAlgorithm == null)
-                throw new ArgumentNullException(nameof(symmetricAlgorithm));
+                throw new ArgumentNullException("symmetricAlgorithm");
 
-            if (symmetricAlgorithm is TripleDES)
+            if (symmetricAlgorithm is DesParameters)
             {
                 // CMS Triple DES Key Wrap
-                return SymmetricKeyWrap.TripleDESKeyWrapDecrypt(symmetricAlgorithm.Key, keyData);
+                return SymmetricKeyWrap.TripleDESKeyWrapDecrypt(symmetricAlgorithm.GetKey(), keyData);
             }
-            else if (symmetricAlgorithm is Rijndael || symmetricAlgorithm is Aes)
+            else
             {
                 // FIPS AES Key Wrap
-                return SymmetricKeyWrap.AESKeyWrapDecrypt(symmetricAlgorithm.Key, keyData);
+                return SymmetricKeyWrap.AESKeyWrapDecrypt(symmetricAlgorithm.GetKey(), keyData);
             }
-            // throw an exception if the transform is not in the previous categories
-            throw new CryptographicException(SR.Cryptography_Xml_NotSupportedCryptographicTransform);
         }
 
         // decrypts the supplied data using an RSA key and specifies whether we want to use OAEP 
         // padding or PKCS#1 v1.5 padding as described in the PKCS specification
-        public static byte[] DecryptKey(byte[] keyData, RSA rsa, bool useOAEP)
+        public static byte[] DecryptKey(byte[] keyData, RsaKeyParameters rsa, bool useOAEP)
         {
             if (keyData == null)
-                throw new ArgumentNullException(nameof(keyData));
+                throw new ArgumentNullException("keyData");
             if (rsa == null)
-                throw new ArgumentNullException(nameof(rsa));
+                throw new ArgumentNullException("rsa");
 
             if (useOAEP)
             {

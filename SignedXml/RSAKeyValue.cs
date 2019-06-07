@@ -21,7 +21,8 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public RSAKeyValue()
         {
-            _key = null;
+            var pair = Utils.RSAGenerateKeyPair();
+            _key = (RsaKeyParameters)pair.Public;
         }
 
         public RSAKeyValue(RsaKeyParameters key)
@@ -70,11 +71,11 @@ namespace Org.BouncyCastle.Crypto.Xml
             XmlElement rsaKeyValueElement = xmlDocument.CreateElement(RSAKeyValueElementName, SignedXml.XmlDsigNamespaceUrl);
 
             XmlElement modulusElement = xmlDocument.CreateElement(ModulusElementName, SignedXml.XmlDsigNamespaceUrl);
-            modulusElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Modulus.ToByteArray())));
+            modulusElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Modulus.ToByteArrayUnsigned())));
             rsaKeyValueElement.AppendChild(modulusElement);
 
             XmlElement exponentElement = xmlDocument.CreateElement(ExponentElementName, SignedXml.XmlDsigNamespaceUrl);
-            exponentElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Exponent.ToByteArray())));
+            exponentElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Exponent.ToByteArrayUnsigned())));
             rsaKeyValueElement.AppendChild(exponentElement);
 
             keyValueElement.AppendChild(rsaKeyValueElement);
@@ -106,28 +107,28 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (value.LocalName != KeyValueElementName
                 || value.NamespaceURI != SignedXml.XmlDsigNamespaceUrl)
             {
-                throw new System.Security.Cryptography.CryptographicException(String.Format("Root element must be {KeyValueElementName} element in namespace {SignedXml.XmlDsigNamespaceUrl}"));
+                throw new System.Security.Cryptography.CryptographicException($"Root element must be {KeyValueElementName} element in namespace {SignedXml.XmlDsigNamespaceUrl}");
             }
 
             const string xmlDsigNamespacePrefix = "dsig";
             XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(value.OwnerDocument.NameTable);
             xmlNamespaceManager.AddNamespace(xmlDsigNamespacePrefix, SignedXml.XmlDsigNamespaceUrl);
 
-            XmlNode rsaKeyValueElement = value.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{RSAKeyValueElementName}"), xmlNamespaceManager);
+            XmlNode rsaKeyValueElement = value.SelectSingleNode($"{xmlDsigNamespacePrefix}:{RSAKeyValueElementName}", xmlNamespaceManager);
             if (rsaKeyValueElement == null)
             {
-                throw new System.Security.Cryptography.CryptographicException(String.Format("{KeyValueElementName} must contain child element {RSAKeyValueElementName}"));
+                throw new System.Security.Cryptography.CryptographicException($"{KeyValueElementName} must contain child element {RSAKeyValueElementName}");
             }
 
             try
             {
                 _key = new RsaKeyParameters(false,
-                    new Math.BigInteger(Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{ModulusElementName}"), xmlNamespaceManager).InnerText)),
-                    new Math.BigInteger(Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{ExponentElementName}"), xmlNamespaceManager).InnerText)));
+                    new Math.BigInteger(1, Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{ModulusElementName}", xmlNamespaceManager).InnerText)),
+                    new Math.BigInteger(1, Convert.FromBase64String(rsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{ExponentElementName}", xmlNamespaceManager).InnerText)));
             }
             catch (Exception ex)
             {
-                throw new System.Security.Cryptography.CryptographicException(String.Format("An error occurred parsing the {ModulusElementName} and {ExponentElementName} elements"), ex);
+                throw new System.Security.Cryptography.CryptographicException($"An error occurred parsing the {ModulusElementName} and {ExponentElementName} elements", ex);
             }
         }
     }

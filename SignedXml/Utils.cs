@@ -3,14 +3,19 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Win32;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Pkix;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
+using Org.BouncyCastle.X509.Store;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
@@ -792,6 +797,44 @@ namespace Org.BouncyCastle.Crypto.Xml
             return false;
         }
 
+        internal static IList<X509Certificate> BuildCertificateChain(X509Certificate primaryCertificate, IEnumerable<X509Certificate> additionalCertificates)
+        {
+            var parser = new X509CertificateParser();
+            var builder = new PkixCertPathBuilder();
+
+            // Separate root from itermediate
+            var intermediateCerts = new List<X509Certificate>();
+            var rootCerts = new BouncyCastle.Utilities.Collections.HashSet();
+
+            foreach (var cert in additionalCertificates) {
+                // Separate root and subordinate certificates
+                if (cert.IssuerDN.Equivalent(cert.SubjectDN))
+                    rootCerts.Add(new TrustAnchor(cert, null));
+                else
+                    intermediateCerts.Add(cert);
+            }
+
+            // Create chain for this certificate
+            var holder = new X509CertStoreSelector();
+            holder.Certificate = primaryCertificate;
+
+            // WITHOUT THIS LINE BUILDER CANNOT BEGIN BUILDING THE CHAIN
+            intermediateCerts.Add(holder.Certificate);
+
+            PkixBuilderParameters builderParams = new PkixBuilderParameters(rootCerts, holder);
+            builderParams.IsRevocationEnabled = false;
+
+            X509CollectionStoreParameters intermediateStoreParameters =
+                new X509CollectionStoreParameters(intermediateCerts);
+
+            builderParams.AddStore(X509StoreFactory.Create(
+                "Certificate/Collection", intermediateStoreParameters));
+
+            PkixCertPathBuilderResult result = builder.Build(builderParams);
+
+            return result.CertPath.Certificates.Cast<X509Certificate>().ToList();
+        }
+
         internal static AsymmetricKeyParameter GetAnyPublicKey(X509Certificate certificate)
         {
             return certificate.GetPublicKey();
@@ -814,8 +857,34 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         internal static X509Certificate CloneCertificate(X509Certificate cert)
         {
+            cert = cert ?? throw new ArgumentNullException(nameof(cert));
             var parser = new X509CertificateParser();
             return parser.ReadCertificate(cert.GetEncoded());
+        }
+
+        internal static AsymmetricCipherKeyPair DSAGenerateKeyPair()
+        {
+            var keyGen = GeneratorUtilities.GetKeyPairGenerator("DSA");
+            var rand = new SecureRandom();
+            var pGen = new DsaParametersGenerator();
+            pGen.Init(512, 80, rand);
+            keyGen.Init(new DsaKeyGenerationParameters(rand, pGen.GenerateParameters()));
+            return keyGen.GenerateKeyPair();
+        }
+
+        internal static AsymmetricCipherKeyPair RSAGenerateKeyPair()
+        {
+            var keyGen = GeneratorUtilities.GetKeyPairGenerator("RSA");
+            keyGen.Init(new KeyGenerationParameters(new SecureRandom(), 1024));
+            return keyGen.GenerateKeyPair();
+        }
+
+        internal static byte[] GenerateRandomBlock(int sizeInBytes)
+        {
+            SecureRandom random = new SecureRandom();
+            byte[] keyBytes = new byte[sizeInBytes];
+            random.NextBytes(keyBytes);
+            return keyBytes;
         }
     }
 }

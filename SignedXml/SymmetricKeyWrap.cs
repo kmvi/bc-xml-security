@@ -2,9 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -24,52 +26,44 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             byte[] rgbCKS;
 
-            using (var sha = SHA1.Create())
-            {
-                // checksum the key
-                rgbCKS = sha.ComputeHash(rgbWrappedKeyData);
-            }
+            var sha = DigestUtilities.GetDigest("SHA-1");
+            // checksum the key
+            rgbCKS = new byte[sha.GetDigestSize()];
+            sha.BlockUpdate(rgbWrappedKeyData, 0, rgbWrappedKeyData.Length);
+            sha.DoFinal(rgbCKS, 0);
 
             // generate a random IV
             byte[] rgbIV = new byte[8];
-            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(rgbIV);
-            }
+            SecureRandom rng = new SecureRandom();
+            rng.NextBytes(rgbIV);
 
             // rgbWKCS = rgbWrappedKeyData | (first 8 bytes of the hash)
             byte[] rgbWKCKS = new byte[rgbWrappedKeyData.Length + 8];
-            TripleDES tripleDES = null;
-            ICryptoTransform enc1 = null;
-            ICryptoTransform enc2 = null;
+            IBufferedCipher enc1 = null;
+            IBufferedCipher enc2 = null;
 
             try
             {
-                tripleDES = TripleDES.Create();
                 // Don't add padding, use CBC mode: for example, a 192 bits key will yield 40 bytes of encrypted data
-                tripleDES.Padding = PaddingMode.None;
-                enc1 = tripleDES.CreateEncryptor(rgbKey, rgbIV);
-                enc2 = tripleDES.CreateEncryptor(rgbKey, s_rgbTripleDES_KW_IV);
+                enc1 = CipherUtilities.GetCipher("DESEDE/CBC/NOPADDING");
+                enc2 = CipherUtilities.GetCipher("DESEDE/CBC/NOPADDING");
+                enc1.Init(true, new ParametersWithIV(new DesEdeParameters(rgbKey), rgbIV));
+                enc2.Init(true, new ParametersWithIV(new DesEdeParameters(rgbKey), s_rgbTripleDES_KW_IV));
 
                 Buffer.BlockCopy(rgbWrappedKeyData, 0, rgbWKCKS, 0, rgbWrappedKeyData.Length);
                 Buffer.BlockCopy(rgbCKS, 0, rgbWKCKS, rgbWrappedKeyData.Length, 8);
-                byte[] temp1 = enc1.TransformFinalBlock(rgbWKCKS, 0, rgbWKCKS.Length);
+                byte[] temp1 = enc1.DoFinal(rgbWKCKS);
                 byte[] temp2 = new byte[rgbIV.Length + temp1.Length];
                 Buffer.BlockCopy(rgbIV, 0, temp2, 0, rgbIV.Length);
                 Buffer.BlockCopy(temp1, 0, temp2, rgbIV.Length, temp1.Length);
                 // temp2 = REV (rgbIV | E_k(rgbWrappedKeyData | rgbCKS))
                 Array.Reverse(temp2);
 
-                return enc2.TransformFinalBlock(temp2, 0, temp2.Length);
+                return enc2.DoFinal(temp2);
             }
             finally
             {
-                if (enc2 != null)
-                    enc2.Dispose();
-                if (enc1 != null)
-                    enc1.Dispose();
-                if (tripleDES != null)
-                    tripleDES.Dispose();
+
             }
         }
 
@@ -79,20 +73,20 @@ namespace Org.BouncyCastle.Crypto.Xml
             // Check to see whether the length of the encrypted key is reasonable
             if (rgbEncryptedWrappedKeyData.Length != 32 && rgbEncryptedWrappedKeyData.Length != 40
                 && rgbEncryptedWrappedKeyData.Length != 48)
-                throw new CryptographicException(SR.Cryptography_Xml_KW_BadKeySize);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_KW_BadKeySize);
 
-            TripleDES tripleDES = null;
-            ICryptoTransform dec1 = null;
-            ICryptoTransform dec2 = null;
+            IBufferedCipher dec1 = null;
+            IBufferedCipher dec2 = null;
 
             try
             {
-                tripleDES = TripleDES.Create();
                 // Assume no padding, use CBC mode
-                tripleDES.Padding = PaddingMode.None;
-                dec1 = tripleDES.CreateDecryptor(rgbKey, s_rgbTripleDES_KW_IV);
+                dec1 = CipherUtilities.GetCipher("DESEDE/CBC/NOPADDING");
+                dec2 = CipherUtilities.GetCipher("DESEDE/CBC/NOPADDING");
+                
+                dec1.Init(false, new ParametersWithIV(new DesEdeParameters(rgbKey), s_rgbTripleDES_KW_IV));
 
-                byte[] temp2 = dec1.TransformFinalBlock(rgbEncryptedWrappedKeyData, 0, rgbEncryptedWrappedKeyData.Length);
+                byte[] temp2 = dec1.DoFinal(rgbEncryptedWrappedKeyData);
                 Array.Reverse(temp2);
                 // Get the IV and temp1
                 byte[] rgbIV = new byte[8];
@@ -100,29 +94,24 @@ namespace Org.BouncyCastle.Crypto.Xml
                 byte[] temp1 = new byte[temp2.Length - rgbIV.Length];
                 Buffer.BlockCopy(temp2, 8, temp1, 0, temp1.Length);
 
-                dec2 = tripleDES.CreateDecryptor(rgbKey, rgbIV);
-                byte[] rgbWKCKS = dec2.TransformFinalBlock(temp1, 0, temp1.Length);
+                dec2.Init(false, new ParametersWithIV(new DesEdeParameters(rgbKey), rgbIV));
+                byte[] rgbWKCKS = dec2.DoFinal(temp1);
 
                 // checksum the key
                 byte[] rgbWrappedKeyData = new byte[rgbWKCKS.Length - 8];
                 Buffer.BlockCopy(rgbWKCKS, 0, rgbWrappedKeyData, 0, rgbWrappedKeyData.Length);
-                using (var sha = SHA1.Create())
-                {
-                    byte[] rgbCKS = sha.ComputeHash(rgbWrappedKeyData);
-                    for (int index = rgbWrappedKeyData.Length, index1 = 0; index < rgbWKCKS.Length; index++, index1++)
-                        if (rgbWKCKS[index] != rgbCKS[index1])
-                            throw new CryptographicException(SR.Cryptography_Xml_BadWrappedKeySize);
-                    return rgbWrappedKeyData;
-                }
+                var sha = DigestUtilities.GetDigest("SHA-1");
+                byte[] rgbCKS = new byte[sha.GetDigestSize()];
+                sha.BlockUpdate(rgbWrappedKeyData, 0, rgbWrappedKeyData.Length);
+                sha.DoFinal(rgbCKS, 0);
+                for (int index = rgbWrappedKeyData.Length, index1 = 0; index < rgbWKCKS.Length; index++, index1++)
+                    if (rgbWKCKS[index] != rgbCKS[index1])
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_BadWrappedKeySize);
+                return rgbWrappedKeyData;
             }
             finally
             {
-                if (dec2 != null)
-                    dec2.Dispose();
-                if (dec1 != null)
-                    dec1.Dispose();
-                if (tripleDES != null)
-                    tripleDES.Dispose();
+
             }
         }
 
@@ -132,19 +121,15 @@ namespace Org.BouncyCastle.Crypto.Xml
             int N = rgbWrappedKeyData.Length >> 3;
             // The information wrapped need not actually be a key, but it needs to be a multiple of 64 bits
             if ((rgbWrappedKeyData.Length % 8 != 0) || N <= 0)
-                throw new CryptographicException(SR.Cryptography_Xml_KW_BadKeySize);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_KW_BadKeySize);
 
-            Aes aes = null;
-            ICryptoTransform enc = null;
+            IBufferedCipher enc = null;
 
             try
             {
-                aes = Aes.Create();
-                aes.Key = rgbKey;
                 // Use ECB mode, no padding
-                aes.Mode = CipherMode.ECB;
-                aes.Padding = PaddingMode.None;
-                enc = aes.CreateEncryptor();
+                enc = CipherUtilities.GetCipher("AES/ECB/NOPADDING");
+                enc.Init(true, new KeyParameter(rgbKey));
                 // special case: only 1 block -- 8 bytes
                 if (N == 1)
                 {
@@ -152,7 +137,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     byte[] temp = new byte[s_rgbAES_KW_IV.Length + rgbWrappedKeyData.Length];
                     Buffer.BlockCopy(s_rgbAES_KW_IV, 0, temp, 0, s_rgbAES_KW_IV.Length);
                     Buffer.BlockCopy(rgbWrappedKeyData, 0, temp, s_rgbAES_KW_IV.Length, rgbWrappedKeyData.Length);
-                    return enc.TransformFinalBlock(temp, 0, temp.Length);
+                    return enc.DoFinal(temp);
                 }
                 // second case: more than 1 block
                 long t = 0;
@@ -169,7 +154,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         t = i + j * N;
                         Buffer.BlockCopy(rgbA, 0, rgbBlock, 0, 8);
                         Buffer.BlockCopy(rgbOutput, 8 * i, rgbBlock, 8, 8);
-                        byte[] rgbB = enc.TransformFinalBlock(rgbBlock, 0, 16);
+                        byte[] rgbB = enc.DoFinal(rgbBlock);
                         for (int k = 0; k < 8; k++)
                         {
                             byte tmp = (byte)((t >> (8 * (7 - k))) & 0xFF);
@@ -184,10 +169,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             finally
             {
-                if (enc != null)
-                    enc.Dispose();
-                if (aes != null)
-                    aes.Dispose();
+
             }
         }
 
@@ -196,29 +178,25 @@ namespace Org.BouncyCastle.Crypto.Xml
             int N = (rgbEncryptedWrappedKeyData.Length >> 3) - 1;
             // The information wrapped need not actually be a key, but it needs to be a multiple of 64 bits
             if ((rgbEncryptedWrappedKeyData.Length % 8 != 0) || N <= 0)
-                throw new CryptographicException(SR.Cryptography_Xml_KW_BadKeySize);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_KW_BadKeySize);
 
             byte[] rgbOutput = new byte[N << 3];
-            Aes aes = null;
-            ICryptoTransform dec = null;
+            IBufferedCipher dec = null;
 
             try
             {
-                aes = Aes.Create();
-                aes.Key = rgbKey;
                 // Use ECB mode, no padding
-                aes.Mode = CipherMode.ECB;
-                aes.Padding = PaddingMode.None;
-                dec = aes.CreateDecryptor();
+                dec = CipherUtilities.GetCipher("AES/ECB/NOPADDING");
+                dec.Init(false, new KeyParameter(rgbKey));
 
                 // special case: only 1 block -- 8 bytes
                 if (N == 1)
                 {
-                    byte[] temp = dec.TransformFinalBlock(rgbEncryptedWrappedKeyData, 0, rgbEncryptedWrappedKeyData.Length);
+                    byte[] temp = dec.DoFinal(rgbEncryptedWrappedKeyData);
                     // checksum the key
                     for (int index = 0; index < 8; index++)
                         if (temp[index] != s_rgbAES_KW_IV[index])
-                            throw new CryptographicException(SR.Cryptography_Xml_BadWrappedKeySize);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_BadWrappedKeySize);
                     // rgbOutput is LSB(temp)
                     Buffer.BlockCopy(temp, 8, rgbOutput, 0, 8);
                     return rgbOutput;
@@ -242,7 +220,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         }
                         Buffer.BlockCopy(rgbA, 0, rgbBlock, 0, 8);
                         Buffer.BlockCopy(rgbOutput, 8 * (i - 1), rgbBlock, 8, 8);
-                        byte[] rgbB = dec.TransformFinalBlock(rgbBlock, 0, 16);
+                        byte[] rgbB = dec.DoFinal(rgbBlock);
                         Buffer.BlockCopy(rgbB, 8, rgbOutput, 8 * (i - 1), 8);
                         Buffer.BlockCopy(rgbB, 0, rgbA, 0, 8);
                     }
@@ -250,15 +228,12 @@ namespace Org.BouncyCastle.Crypto.Xml
                 // checksum the key
                 for (int index = 0; index < 8; index++)
                     if (rgbA[index] != s_rgbAES_KW_IV[index])
-                        throw new CryptographicException(SR.Cryptography_Xml_BadWrappedKeySize);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_BadWrappedKeySize);
                 return rgbOutput;
             }
             finally
             {
-                if (dec != null)
-                    dec.Dispose();
-                if (aes != null)
-                    aes.Dispose();
+
             }
         }
     }

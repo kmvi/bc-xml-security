@@ -378,4 +378,7 @@
   <data name="Log_UnsafeTransformMethod" xml:space="preserve">
     <value>Transform method "{0}" is not on the safe list. Safe transform methods are: {1}.</value>
   </data>
+  <data name="Cryptography_MissingKey" xml:space="preserve">
+    <value>No asymmetric key object has been associated with this formatter object.</value>
+  </data>
 </root>

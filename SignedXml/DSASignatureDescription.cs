@@ -21,7 +21,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public sealed override AsymmetricSignatureDeformatter CreateDeformatter(AsymmetricAlgorithm key)
         {
-            var item = (AsymmetricSignatureDeformatter)CryptoHelpers.CreateFromName(DeformatterAlgorithm);
+            var item = CryptoHelpers.CreateFromName<AsymmetricSignatureDeformatter>(DeformatterAlgorithm);
             item.SetKey(key);
             item.SetHashAlgorithm(HashAlgorithm);
             return item;
@@ -29,7 +29,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public sealed override AsymmetricSignatureFormatter CreateFormatter(AsymmetricAlgorithm key)
         {
-            var item = (AsymmetricSignatureFormatter)CryptoHelpers.CreateFromName(FormatterAlgorithm);
+            var item = CryptoHelpers.CreateFromName<AsymmetricSignatureFormatter>(FormatterAlgorithm);
             item.SetKey(key);
             item.SetHashAlgorithm(HashAlgorithm);
             return item;

@@ -32,7 +32,6 @@
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
       <HintPath>..\packages\BouncyCastle.1.8.5\lib\BouncyCastle.Crypto.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -61,27 +60,53 @@
     <Compile Include="CanonicalXmlText.cs" />
     <Compile Include="CanonicalXmlWhitespace.cs" />
     <Compile Include="CertUsageType.cs" />
+    <Compile Include="CipherData.cs" />
+    <Compile Include="CipherReference.cs" />
     <Compile Include="CryptoHelpers.cs" />
     <Compile Include="CryptoSignedXmlRecursionException.cs" />
     <Compile Include="DataObject.cs" />
+    <Compile Include="DataReference.cs" />
     <Compile Include="DocPosition.cs" />
+    <Compile Include="DsaDigestSigner2.cs" />
     <Compile Include="DSAKeyValue.cs" />
+    <Compile Include="DSASignatureDescription.cs" />
+    <Compile Include="EncryptedData.cs" />
+    <Compile Include="EncryptedKey.cs" />
+    <Compile Include="EncryptedReference.cs" />
+    <Compile Include="EncryptedType.cs" />
+    <Compile Include="EncryptedXml.cs" />
+    <Compile Include="EncryptionMethod.cs" />
+    <Compile Include="EncryptionProperty.cs" />
+    <Compile Include="EncryptionPropertyCollection.cs" />
     <Compile Include="ExcAncestralNamespaceContextManager.cs" />
     <Compile Include="ExcCanonicalXml.cs" />
     <Compile Include="ICanonicalizableNode.cs" />
+    <Compile Include="IRelDecryptor.cs" />
     <Compile Include="KeyInfo.cs" />
     <Compile Include="KeyInfoClause.cs" />
+    <Compile Include="KeyInfoEncryptedKey.cs" />
     <Compile Include="KeyInfoName.cs" />
     <Compile Include="KeyInfoNode.cs" />
     <Compile Include="KeyInfoRetrievalMethod.cs" />
     <Compile Include="KeyInfoX509Data.cs" />
+    <Compile Include="KeyReference.cs" />
     <Compile Include="MyXmlDocument.cs" />
     <Compile Include="NamespaceFrame.cs" />
     <Compile Include="NamespaceSortOrder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reference.cs" />
+    <Compile Include="ReferenceList.cs" />
     <Compile Include="ReferenceTargetType.cs" />
     <Compile Include="RSAKeyValue.cs" />
+    <Compile Include="RSAOAEPKeyExchangeDeformatter.cs" />
+    <Compile Include="RSAOAEPKeyExchangeFormatter.cs" />
+    <Compile Include="RSAPKCS1KeyExchangeDeformatter.cs" />
+    <Compile Include="RSAPKCS1KeyExchangeFormatter.cs" />
+    <Compile Include="RSAPKCS1SHA1SignatureDescription.cs" />
+    <Compile Include="RSAPKCS1SHA256SignatureDescription.cs" />
+    <Compile Include="RSAPKCS1SHA384SignatureDescription.cs" />
+    <Compile Include="RSAPKCS1SHA512SignatureDescription.cs" />
+    <Compile Include="RSAPKCS1SignatureDescription.cs" />
     <Compile Include="Signature.cs" />
     <Compile Include="SignedInfo.cs" />
     <Compile Include="SignedXml.cs" />
@@ -98,7 +123,9 @@
     <Compile Include="Utils.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="X509IncludeOption.cs" />
     <Compile Include="X509IssuerSerial.cs" />
+    <Compile Include="XmlDecryptionTransform.cs" />
     <Compile Include="XmlDsigBase64Transform.cs" />
     <Compile Include="XmlDsigC14NTransform.cs" />
     <Compile Include="XmlDsigC14NWithCommentsTransform.cs" />
@@ -107,6 +134,7 @@
     <Compile Include="XmlDsigExcC14NWithCommentsTransform.cs" />
     <Compile Include="XmlDsigXPathTransform.cs" />
     <Compile Include="XmlDsigXsltTransform.cs" />
+    <Compile Include="XmlLicenseTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SR.resx">
@@ -117,6 +145,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

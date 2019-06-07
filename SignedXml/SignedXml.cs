@@ -54,7 +54,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private const string XmlDsigMoreHMACRIPEMD160Url = "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160";
 
         // defines the XML encryption processing rules
-        //private EncryptedXml _exml = null;
+        private EncryptedXml _exml = null;
 
         //
         // public constant Url identifiers most frequently used within the XML Signature classes
@@ -186,7 +186,6 @@ namespace Org.BouncyCastle.Crypto.Xml
             set { _signingKey = value; }
         }
 
-        /*
         public EncryptedXml EncryptedXml
         {
             get
@@ -197,7 +196,6 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             set { _exml = value; }
         }
-        */
 
         public Signature Signature
         {
@@ -325,6 +323,29 @@ namespace Org.BouncyCastle.Crypto.Xml
             return true;
         }
 
+        // TODO: implement
+        /*
+        public bool CheckSignature(KeyedHashAlgorithm macAlg)
+        {
+            if (!CheckSignatureFormat()) {
+                return false;
+            }
+
+            if (!CheckSignedInfo(macAlg)) {
+                SignedXmlDebugLog.LogVerificationFailure(this, SR.Log_VerificationFailed_SignedInfo);
+                return false;
+            }
+
+            if (!CheckDigestedReferences()) {
+                SignedXmlDebugLog.LogVerificationFailure(this, SR.Log_VerificationFailed_References);
+                return false;
+            }
+
+            SignedXmlDebugLog.LogVerificationResult(this, macAlg, true);
+            return true;
+        }
+        */
+
         public bool CheckSignature(X509Certificate certificate, bool verifySignatureOnly)
         {
             if (!verifySignatureOnly)
@@ -413,6 +434,60 @@ namespace Org.BouncyCastle.Crypto.Xml
             //SignedXmlDebugLog.LogSigning(this, key, signatureDescription, hashAlg, asymmetricSignatureFormatter);
             m_signature.SignatureValue = signatureDescription.GenerateSignature();
         }
+
+        // TODO: implement
+        /*
+        public void ComputeSignature(KeyedHashAlgorithm macAlg)
+        {
+            if (macAlg == null)
+                throw new ArgumentNullException("macAlg");
+
+            HMAC hash = macAlg as HMAC;
+            if (hash == null)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
+
+            int signatureLength;
+            if (m_signature.SignedInfo.SignatureLength == null)
+                signatureLength = hash.HashSize;
+            else
+                signatureLength = Convert.ToInt32(m_signature.SignedInfo.SignatureLength, null);
+            // signatureLength should be less than hash size
+            if (signatureLength < 0 || signatureLength > hash.HashSize)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength);
+            if (signatureLength % 8 != 0)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength2);
+
+            BuildDigestedReferences();
+            switch (hash.HashName) {
+                case "SHA1":
+                    SignedInfo.SignatureMethod = SignedXml.XmlDsigHMACSHA1Url;
+                    break;
+                case "SHA256":
+                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA256Url;
+                    break;
+                case "SHA384":
+                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA384Url;
+                    break;
+                case "SHA512":
+                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA512Url;
+                    break;
+                case "MD5":
+                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACMD5Url;
+                    break;
+                case "RIPEMD160":
+                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACRIPEMD160Url;
+                    break;
+                default:
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
+            }
+
+            byte[] hashValue = GetC14NDigest(hash);
+
+            SignedXmlDebugLog.LogSigning(this, hash);
+            m_signature.SignatureValue = new byte[signatureLength / 8];
+            Buffer.BlockCopy(hashValue, 0, m_signature.SignatureValue, 0, signatureLength / 8);
+        }
+        */
 
         //
         // virtual methods

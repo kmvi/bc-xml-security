@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.Crypto.Paddings;
 using System;
 using System.Collections;
 using System.IO;
@@ -103,14 +104,14 @@ namespace Org.BouncyCastle.Crypto.Xml
                         // the Uri is required
                         string uri = Utils.GetAttribute(elem, "URI", XmlDecryptionTransformNamespaceUrl);
                         if (uri == null || uri.Length == 0 || uri[0] != '#')
-                            throw new CryptographicException(SR.Cryptography_Xml_UriRequired);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriRequired);
                         if (!Utils.VerifyAttributes(elem, "URI")) {
-                            throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                            throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                         }
                         string idref = Utils.ExtractIdFromLocalUri(uri);
                         ExceptUris.Add(idref);
                     } else {
-                        throw new CryptographicException(SR.Cryptography_Xml_UnknownTransform);
+                        throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                     }
                 }
             }
@@ -204,7 +205,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             EncryptedData ed = new EncryptedData();
             ed.LoadXml(encryptedDataElement);
-            SymmetricAlgorithm symAlg = EncryptedXml.GetDecryptionKey(ed, null);
+            ICipherParameters symAlg = EncryptedXml.GetDecryptionKey(ed, null);
             if (symAlg == null)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingDecryptionKey);
             byte[] decrypted = EncryptedXml.DecryptData(ed, symAlg);

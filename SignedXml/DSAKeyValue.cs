@@ -21,7 +21,8 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public DSAKeyValue()
         {
-            _key = null;
+            var pair = Utils.DSAGenerateKeyPair();
+            _key = (DsaPublicKeyParameters)pair.Public;
         }
 
         public DSAKeyValue(DsaPublicKeyParameters key)
@@ -83,19 +84,19 @@ namespace Org.BouncyCastle.Crypto.Xml
             XmlElement dsaKeyValueElement = xmlDocument.CreateElement(DSAKeyValueElementName, SignedXml.XmlDsigNamespaceUrl);
 
             XmlElement pElement = xmlDocument.CreateElement(PElementName, SignedXml.XmlDsigNamespaceUrl);
-            pElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Parameters.P.ToByteArray())));
+            pElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Parameters.P.ToByteArrayUnsigned())));
             dsaKeyValueElement.AppendChild(pElement);
 
             XmlElement qElement = xmlDocument.CreateElement(QElementName, SignedXml.XmlDsigNamespaceUrl);
-            qElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Parameters.Q.ToByteArray())));
+            qElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Parameters.Q.ToByteArrayUnsigned())));
             dsaKeyValueElement.AppendChild(qElement);
 
             XmlElement gElement = xmlDocument.CreateElement(GElementName, SignedXml.XmlDsigNamespaceUrl);
-            gElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Parameters.G.ToByteArray())));
+            gElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Parameters.G.ToByteArrayUnsigned())));
             dsaKeyValueElement.AppendChild(gElement);
 
             XmlElement yElement = xmlDocument.CreateElement(YElementName, SignedXml.XmlDsigNamespaceUrl);
-            yElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Y.ToByteArray())));
+            yElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Y.ToByteArrayUnsigned())));
             dsaKeyValueElement.AppendChild(yElement);
 
             // Add optional components if present
@@ -106,8 +107,8 @@ namespace Org.BouncyCastle.Crypto.Xml
                 dsaKeyValueElement.AppendChild(jElement);
             }*/
 
-            //if (dsaParams.Seed != null)
-            //{  // note we assume counter is correct if Seed is present
+            if (_key.Parameters.ValidationParameters != null)
+            {  // note we assume counter is correct if Seed is present
                 XmlElement seedElement = xmlDocument.CreateElement(SeedElementName, SignedXml.XmlDsigNamespaceUrl);
                 seedElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(_key.Parameters.ValidationParameters.GetSeed())));
                 dsaKeyValueElement.AppendChild(seedElement);
@@ -115,7 +116,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 XmlElement counterElement = xmlDocument.CreateElement(PgenCounterElementName, SignedXml.XmlDsigNamespaceUrl);
                 counterElement.AppendChild(xmlDocument.CreateTextNode(Convert.ToBase64String(Utils.ConvertIntToByteArray(_key.Parameters.ValidationParameters.Counter))));
                 dsaKeyValueElement.AppendChild(counterElement);
-            //}
+            }
 
             keyValueElement.AppendChild(dsaKeyValueElement);
 
@@ -146,45 +147,45 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (value.Name != KeyValueElementName
                 || value.NamespaceURI != SignedXml.XmlDsigNamespaceUrl)
             {
-                throw new System.Security.Cryptography.CryptographicException(String.Format("Root element must be {KeyValueElementName} element in namepsace {SignedXml.XmlDsigNamespaceUrl}"));
+                throw new System.Security.Cryptography.CryptographicException($"Root element must be {KeyValueElementName} element in namepsace {SignedXml.XmlDsigNamespaceUrl}");
             }
 
             const string xmlDsigNamespacePrefix = "dsig";
             XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(value.OwnerDocument.NameTable);
             xmlNamespaceManager.AddNamespace(xmlDsigNamespacePrefix, SignedXml.XmlDsigNamespaceUrl);
 
-            XmlNode dsaKeyValueElement = value.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{DSAKeyValueElementName}"), xmlNamespaceManager);
+            XmlNode dsaKeyValueElement = value.SelectSingleNode($"{xmlDsigNamespacePrefix}:{DSAKeyValueElementName}", xmlNamespaceManager);
             if (dsaKeyValueElement == null)
             {
-                throw new System.Security.Cryptography.CryptographicException(String.Format("{KeyValueElementName} must contain child element {DSAKeyValueElementName}"));
+                throw new System.Security.Cryptography.CryptographicException($"{KeyValueElementName} must contain child element {DSAKeyValueElementName}");
             }
 
-            XmlNode yNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{YElementName}"), xmlNamespaceManager);
+            XmlNode yNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{YElementName}", xmlNamespaceManager);
             if (yNode == null)
-                throw new System.Security.Cryptography.CryptographicException(String.Format("{YElementName} is missing"));
+                throw new System.Security.Cryptography.CryptographicException($"{YElementName} is missing");
 
-            XmlNode pNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{PElementName}"), xmlNamespaceManager);
-            XmlNode qNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{QElementName}"), xmlNamespaceManager);
+            XmlNode pNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{PElementName}", xmlNamespaceManager);
+            XmlNode qNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{QElementName}", xmlNamespaceManager);
 
             if ((pNode == null && qNode != null) || (pNode != null && qNode == null))
-                throw new System.Security.Cryptography.CryptographicException(String.Format("{PElementName} and {QElementName} can only occour in combination"));
+                throw new System.Security.Cryptography.CryptographicException($"{PElementName} and {QElementName} can only occour in combination");
 
 
-            XmlNode gNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{GElementName}"), xmlNamespaceManager);
-            XmlNode jNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{JElementName}"), xmlNamespaceManager);
+            XmlNode gNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{GElementName}", xmlNamespaceManager);
+            XmlNode jNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{JElementName}", xmlNamespaceManager);
 
-            XmlNode seedNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{SeedElementName}"), xmlNamespaceManager);
-            XmlNode pgenCounterNode = dsaKeyValueElement.SelectSingleNode(String.Format("{xmlDsigNamespacePrefix}:{PgenCounterElementName}"), xmlNamespaceManager);
+            XmlNode seedNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{SeedElementName}", xmlNamespaceManager);
+            XmlNode pgenCounterNode = dsaKeyValueElement.SelectSingleNode($"{xmlDsigNamespacePrefix}:{PgenCounterElementName}", xmlNamespaceManager);
             if ((seedNode == null && pgenCounterNode != null) || (seedNode != null && pgenCounterNode == null))
-                throw new System.Security.Cryptography.CryptographicException(String.Format("{SeedElementName} and {PgenCounterElementName} can only occur in combination"));
+                throw new System.Security.Cryptography.CryptographicException($"{SeedElementName} and {PgenCounterElementName} can only occur in combination");
 
             try
             {
-                _key = new DsaPublicKeyParameters(new Math.BigInteger(Convert.FromBase64String(yNode.InnerText)),
+                _key = new DsaPublicKeyParameters(new Math.BigInteger(1, Convert.FromBase64String(yNode.InnerText)),
                     new DsaParameters(
-                        new Math.BigInteger((pNode != null) ? Convert.FromBase64String(pNode.InnerText) : null),
-                        new Math.BigInteger((qNode != null) ? Convert.FromBase64String(qNode.InnerText) : null),
-                        new Math.BigInteger((gNode != null) ? Convert.FromBase64String(gNode.InnerText) : null),
+                        new Math.BigInteger(1, (pNode != null) ? Convert.FromBase64String(pNode.InnerText) : null),
+                        new Math.BigInteger(1, (qNode != null) ? Convert.FromBase64String(qNode.InnerText) : null),
+                        new Math.BigInteger(1, (gNode != null) ? Convert.FromBase64String(gNode.InnerText) : null),
                         new DsaValidationParameters(
                             (seedNode != null) ? Convert.FromBase64String(seedNode.InnerText) : null,
                             (pgenCounterNode != null) ? Utils.ConvertByteArrayToInt(Convert.FromBase64String(pgenCounterNode.InnerText)) : 0)));

@@ -7,8 +7,9 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
+using Org.BouncyCastle.Crypto.Xml;
 
-namespace Org.BouncyCastle.Crypto.Xml
+namespace Org.BouncyCastle.X509
 {
     public struct X509IssuerSerial
     {

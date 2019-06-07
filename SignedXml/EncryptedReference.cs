@@ -109,7 +109,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public virtual void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             ReferenceType = value.LocalName;
             

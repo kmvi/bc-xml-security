@@ -3,6 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
 using System;
@@ -36,10 +39,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return new XmlDsigXsltTransform();
                 case "http://www.w3.org/2000/09/xmldsig#enveloped-signature":
                     return new XmlDsigEnvelopedSignatureTransform();
-                //case "http://www.w3.org/2002/07/decrypt#XML":
-                //    return new XmlDecryptionTransform();
-                //case "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform":
-                //    return new XmlLicenseTransform();
+                case "http://www.w3.org/2002/07/decrypt#XML":
+                    return new XmlDecryptionTransform();
+                case "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform":
+                    return new XmlLicenseTransform();
                 case "http://www.w3.org/2000/09/xmldsig# X509Data":
                     return new KeyInfoX509Data();
                 case "http://www.w3.org/2000/09/xmldsig# KeyName":
@@ -50,11 +53,12 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return new RSAKeyValue();
                 case "http://www.w3.org/2000/09/xmldsig# RetrievalMethod":
                     return new KeyInfoRetrievalMethod();
-                //case "http://www.w3.org/2001/04/xmlenc# EncryptedKey":
-                //    return new KeyInfoEncryptedKey();
+                case "http://www.w3.org/2001/04/xmlenc# EncryptedKey":
+                    return new KeyInfoEncryptedKey();
                 case "http://www.w3.org/2000/09/xmldsig#dsa-sha1":
                 case "System.Security.Cryptography.DSASignatureDescription":
-                    return SignerUtilities.GetSigner("DSAWITHSHA1");
+                    //return SignerUtilities.GetSigner("DSAWITHSHA1");
+                    return new DsaDigestSigner2(new DsaSigner(), new Sha1Digest());
                 case "http://www.w3.org/2000/09/xmldsig#rsa-sha1":
                 case "System.Security.Cryptography.RSASignatureDescription":
                     return SignerUtilities.GetSigner("SHA1WITHRSA");
@@ -76,6 +80,12 @@ namespace Org.BouncyCastle.Crypto.Xml
                 // remove attribute from this method when removing them
                 case "http://www.w3.org/2000/09/xmldsig#sha1":
                     return DigestUtilities.GetDigest("SHA-1");
+                case "http://www.w3.org/2001/04/xmlenc#sha256":
+                    return DigestUtilities.GetDigest("SHA-256");
+                case "http://www.w3.org/2001/04/xmlenc#sha512":
+                    return DigestUtilities.GetDigest("SHA-512");
+                case "http://www.w3.org/2001/04/xmlenc#ripemd160":
+                    return DigestUtilities.GetDigest("RIPEMD-160");
                 case "MD5":
                     return DigestUtilities.GetDigest("MD5");
                 case "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr3411":
@@ -87,8 +97,16 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return DigestUtilities.GetDigest("GOST3411-2012-512");
                 case "http://www.w3.org/2001/04/xmldsig-more#hmac-md5":
                     return MacUtilities.GetMac("HMAC-MD5");
+                case "http://www.w3.org/2001/04/xmlenc#des-cbc":
+                    return CipherUtilities.GetCipher("DES/CBC/PKCS7Padding");
                 case "http://www.w3.org/2001/04/xmlenc#tripledes-cbc":
                     return CipherUtilities.GetCipher("DESede/CBC/PKCS7Padding");
+                case "http://www.w3.org/2001/04/xmlenc#aes128-cbc":
+                    return new PaddedBufferedBlockCipher(new CbcBlockCipher(new RijndaelEngine(128)), new Pkcs7Padding());
+                case "http://www.w3.org/2001/04/xmlenc#aes192-cbc":
+                    return new PaddedBufferedBlockCipher(new CbcBlockCipher(new RijndaelEngine(192)), new Pkcs7Padding());
+                case "http://www.w3.org/2001/04/xmlenc#aes256-cbc":
+                    return new PaddedBufferedBlockCipher(new CbcBlockCipher(new RijndaelEngine(256)), new Pkcs7Padding());
             }
 
             return null;

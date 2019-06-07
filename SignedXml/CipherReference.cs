@@ -71,11 +71,13 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+                throw new ArgumentNullException("value");
 
             ReferenceType = value.LocalName;
             string uri = Utils.GetAttribute(value, "URI", EncryptedXml.XmlEncNamespaceUrl);
-            Uri = uri ?? throw new CryptographicException(SR.Cryptography_Xml_UriRequired);
+            if (uri == null)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriRequired);
+            Uri = uri;
 
             // Transforms
             XmlNamespaceManager nsm = new XmlNamespaceManager(value.OwnerDocument.NameTable);

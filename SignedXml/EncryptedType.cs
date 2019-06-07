@@ -116,7 +116,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException("value");
 
                 _cipherData = value;
                 _cachedXml = null;
