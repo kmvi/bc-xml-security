@@ -82,6 +82,8 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return DigestUtilities.GetDigest("SHA-1");
                 case "http://www.w3.org/2001/04/xmlenc#sha256":
                     return DigestUtilities.GetDigest("SHA-256");
+                case "http://www.w3.org/2001/04/xmldsig-more#sha384":
+                    return DigestUtilities.GetDigest("SHA-384");
                 case "http://www.w3.org/2001/04/xmlenc#sha512":
                     return DigestUtilities.GetDigest("SHA-512");
                 case "http://www.w3.org/2001/04/xmlenc#ripemd160":
@@ -102,10 +104,13 @@ namespace Org.BouncyCastle.Crypto.Xml
                 case "http://www.w3.org/2001/04/xmlenc#tripledes-cbc":
                     return CipherUtilities.GetCipher("DESede/CBC/PKCS7Padding");
                 case "http://www.w3.org/2001/04/xmlenc#aes128-cbc":
+                case "http://www.w3.org/2001/04/xmlenc#kw-aes128":
                     return new PaddedBufferedBlockCipher(new CbcBlockCipher(new RijndaelEngine(128)), new Pkcs7Padding());
                 case "http://www.w3.org/2001/04/xmlenc#aes192-cbc":
+                case "http://www.w3.org/2001/04/xmlenc#kw-aes192":
                     return new PaddedBufferedBlockCipher(new CbcBlockCipher(new RijndaelEngine(192)), new Pkcs7Padding());
                 case "http://www.w3.org/2001/04/xmlenc#aes256-cbc":
+                case "http://www.w3.org/2001/04/xmlenc#kw-aes256":
                     return new PaddedBufferedBlockCipher(new CbcBlockCipher(new RijndaelEngine(256)), new Pkcs7Padding());
             }
 

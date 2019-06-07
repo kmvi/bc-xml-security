@@ -385,7 +385,16 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingAlgorithm);
                 }
-                return new KeyParameter(key);
+
+                KeyParameter keyParam;
+                if (symAlg.AlgorithmName.IndexOf("DESede", StringComparison.OrdinalIgnoreCase) >= 0)
+                    keyParam = new DesEdeParameters(key);
+                else if (symAlg.AlgorithmName.IndexOf("DES", StringComparison.OrdinalIgnoreCase) >= 0)
+                    keyParam = new DesParameters(key);
+                else
+                    keyParam = new KeyParameter(key);
+
+                return keyParam;
             }
             return null;
         }
@@ -680,10 +689,19 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (symmetricAlgorithm == null)
                 throw new ArgumentNullException("symmetricAlgorithm");
 
-            byte[] cipher = null;
-            IBufferedCipher enc = CipherUtilities.GetCipher($"Rijndael/{_mode}/{_padding}");
+            var ivParam = symmetricAlgorithm as ParametersWithIV;
+            var keyParam = ivParam == null ? symmetricAlgorithm as KeyParameter : ivParam.Parameters as KeyParameter;
+
+            IBufferedCipher enc;
+            if (keyParam is DesEdeParameters)
+                enc = CipherUtilities.GetCipher($"DESede/{_mode}/{_padding}");
+            else if (keyParam is DesParameters)
+                enc = CipherUtilities.GetCipher($"DES/{_mode}/{_padding}");
+            else
+                enc = CipherUtilities.GetCipher($"AES/{_mode}/{_padding}");
+
             enc.Init(true, symmetricAlgorithm);
-            cipher = enc.DoFinal(plaintext);
+            byte[] cipher = enc.DoFinal(plaintext);
 
             byte[] output = null;
             if (_mode.Equals("ECB", StringComparison.OrdinalIgnoreCase))
@@ -720,6 +738,9 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (symmetricAlgorithm == null)
                 throw new ArgumentNullException("symmetricAlgorithm");
 
+            var ivParam = symmetricAlgorithm as ParametersWithIV;
+            var keyParam = ivParam == null ? symmetricAlgorithm as KeyParameter : ivParam.Parameters as KeyParameter;
+
             // get the cipher value and decrypt
             byte[] cipherValue = GetCipherValue(encryptedData.CipherData);
 
@@ -732,16 +753,18 @@ namespace Org.BouncyCastle.Crypto.Xml
             int lengthIV = 0;
             if (decryptionIV != null)
             {
-                KeyParameter keyParam = null;
-                if (symmetricAlgorithm is ParametersWithIV prmIV)
-                    keyParam = (KeyParameter)prmIV.Parameters;
-                else
-                    keyParam = (KeyParameter)symmetricAlgorithm;
                 symmetricAlgorithm = new ParametersWithIV(keyParam, decryptionIV);
                 lengthIV = decryptionIV.Length;
             }
 
-            var dec = CipherUtilities.GetCipher($"Rijndael/{_mode}/{_padding}");
+            IBufferedCipher dec;
+            if (keyParam is DesEdeParameters)
+                dec = CipherUtilities.GetCipher($"DESede/{_mode}/{_padding}");
+            else if (keyParam is DesParameters)
+                dec = CipherUtilities.GetCipher($"DES/{_mode}/{_padding}");
+            else
+                dec = CipherUtilities.GetCipher($"AES/{_mode}/{_padding}");
+
             dec.Init(false, symmetricAlgorithm);
             output = dec.DoFinal(cipherValue, lengthIV, cipherValue.Length - lengthIV);
 
