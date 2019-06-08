@@ -667,8 +667,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// <param name="signedXml">SignedXml object calculating the signature</param>
         /// <param name="key">key the signature is created with</param>
         /// <param name="hash">hash algorithm used to digest the output</param>
-        /// <param name="asymmetricSignatureFormatter">signature formatter used to do the signing</param>
-        internal static void LogSigning(SignedXml signedXml, KeyedHashAlgorithm key)
+        internal static void LogSigning(SignedXml signedXml, IMac key)
         {
             Debug.Assert(signedXml != null, "signedXml != null");
             Debug.Assert(key != null, "key != null");

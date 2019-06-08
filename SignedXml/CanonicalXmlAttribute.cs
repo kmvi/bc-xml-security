@@ -34,15 +34,15 @@ namespace Org.BouncyCastle.Crypto.Xml
             strBuilder.Append("\"");
         }
 
-        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             UTF8Encoding utf8 = new UTF8Encoding(false);
             byte[] rgbData = utf8.GetBytes(" " + Name + "=\"");
-            signer.BlockUpdate(rgbData, 0, rgbData.Length);
+            hash.BlockUpdate(rgbData, 0, rgbData.Length);
             rgbData = utf8.GetBytes(Utils.EscapeAttributeValue(Value));
-            signer.BlockUpdate(rgbData, 0, rgbData.Length);
+            hash.BlockUpdate(rgbData, 0, rgbData.Length);
             rgbData = utf8.GetBytes("\"");
-            signer.BlockUpdate(rgbData, 0, rgbData.Length);
+            hash.BlockUpdate(rgbData, 0, rgbData.Length);
         }
     }
 }

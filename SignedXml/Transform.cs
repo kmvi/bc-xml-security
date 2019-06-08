@@ -157,15 +157,15 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public abstract object GetOutput(Type type);
 
-        public virtual void GetDigestedOutput(ISigner signer)
+        public virtual void GetDigestedOutput(IHash hash)
         {
             // Default the buffer size to 4K.
             byte[] buffer = new byte[4096];
             int bytesRead;
             var inputStream = (Stream)GetOutput(typeof(Stream));
-            signer.Reset();
+            hash.Reset();
             while ((bytesRead = inputStream.Read(buffer, 0, buffer.Length)) > 0) {
-                signer.BlockUpdate(buffer, 0, bytesRead);
+                hash.BlockUpdate(buffer, 0, bytesRead);
             }
         }
 

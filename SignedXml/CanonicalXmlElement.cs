@@ -98,7 +98,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             Hashtable nsLocallyDeclared = new Hashtable();
             SortedList nsListToRender = new SortedList(new NamespaceSortOrder());
@@ -141,17 +141,17 @@ namespace Org.BouncyCastle.Crypto.Xml
             {
                 anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
                 rgbData = utf8.GetBytes("<" + Name);
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
                 foreach (object attr in nsListToRender.GetKeyList())
                 {
-                    (attr as CanonicalXmlAttribute).WriteHash(signer, docPos, anc);
+                    (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
                 }
                 foreach (object attr in attrListToRender.GetKeyList())
                 {
-                    (attr as CanonicalXmlAttribute).WriteHash(signer, docPos, anc);
+                    (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
                 }
                 rgbData = utf8.GetBytes(">");
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
             }
 
             anc.EnterElementContext();
@@ -161,7 +161,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             XmlNodeList childNodes = ChildNodes;
             foreach (XmlNode childNode in childNodes)
             {
-                CanonicalizationDispatcher.WriteHash(childNode, signer, docPos, anc);
+                CanonicalizationDispatcher.WriteHash(childNode, hash, docPos, anc);
             }
 
             anc.ExitElementContext();
@@ -169,7 +169,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (IsInNodeSet)
             {
                 rgbData = utf8.GetBytes("</" + Name + ">");
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
             }
         }
     }

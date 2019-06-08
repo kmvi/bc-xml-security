@@ -43,7 +43,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 strBuilder.Append((char)10);
         }
 
-        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (!IsInNodeSet)
                 return;
@@ -53,23 +53,23 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (docPos == DocPosition.AfterRootElement)
             {
                 rgbData = utf8.GetBytes("(char) 10");
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
             }
             rgbData = utf8.GetBytes("<?");
-            signer.BlockUpdate(rgbData, 0, rgbData.Length);
+            hash.BlockUpdate(rgbData, 0, rgbData.Length);
             rgbData = utf8.GetBytes((Name));
-            signer.BlockUpdate(rgbData, 0, rgbData.Length);
+            hash.BlockUpdate(rgbData, 0, rgbData.Length);
             if ((Value != null) && (Value.Length > 0))
             {
                 rgbData = utf8.GetBytes(" " + Value);
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
             }
             rgbData = utf8.GetBytes("?>");
-            signer.BlockUpdate(rgbData, 0, rgbData.Length);
+            hash.BlockUpdate(rgbData, 0, rgbData.Length);
             if (docPos == DocPosition.BeforeRootElement)
             {
                 rgbData = utf8.GetBytes("(char) 10");
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
             }
         }
     }

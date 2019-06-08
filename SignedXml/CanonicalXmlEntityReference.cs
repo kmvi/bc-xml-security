@@ -33,10 +33,10 @@ namespace Org.BouncyCastle.Crypto.Xml
                 CanonicalizationDispatcher.WriteGenericNode(this, strBuilder, docPos, anc);
         }
 
-        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (IsInNodeSet)
-                CanonicalizationDispatcher.WriteHashGenericNode(this, signer, docPos, anc);
+                CanonicalizationDispatcher.WriteHashGenericNode(this, hash, docPos, anc);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private TransformChain _transformChain;
         private string _digestMethod;
         private byte[] _digestValue;
-        private IDigest _hashAlgorithm;
+        private IHash _hashAlgorithm;
         private object _refTarget;
         private ReferenceTargetType _refTargetType;
         private XmlElement _cachedXml;
@@ -341,9 +341,18 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             // refList is a list of elements that might be targets of references
             // Now's the time to create our hashing algorithm
-            _hashAlgorithm = CryptoHelpers.CreateFromName<IDigest>(_digestMethod);
-            if (_hashAlgorithm == null)
-                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CreateHashAlgorithmFailed);
+            IDigest digest = CryptoHelpers.CreateFromName<IDigest>(_digestMethod);
+            if (digest == null)
+            {
+                IMac mac = CryptoHelpers.CreateFromName<IMac>(_digestMethod);
+                if (mac == null)
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CreateHashAlgorithmFailed);
+                _hashAlgorithm = new MacHashWrapper(mac);
+            }
+            else
+            {
+                _hashAlgorithm = new DigestHashWrapper(digest);
+            }
 
             // Let's go get the target.
             string baseUri = (document == null ? System.Environment.CurrentDirectory + "\\" : document.BaseURI);
@@ -471,7 +480,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 while ((bytesRead = hashInputStream.Read(buffer, 0, buffer.Length)) > 0) {
                     _hashAlgorithm.BlockUpdate(buffer, 0, bytesRead);
                 }
-                _hashval = new byte[_hashAlgorithm.GetDigestSize()];
+                _hashval = new byte[_hashAlgorithm.GetHashSize()];
                 _hashAlgorithm.DoFinal(_hashval, 0);
             }
             finally

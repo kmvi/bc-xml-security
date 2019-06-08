@@ -18,6 +18,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Crypto.Macs;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -327,9 +328,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return true;
         }
 
-        // TODO: implement
-        /*
-        public bool CheckSignature(KeyedHashAlgorithm macAlg)
+        public bool CheckSignature(IMac macAlg)
         {
             if (!CheckSignatureFormat()) {
                 return false;
@@ -348,7 +347,6 @@ namespace Org.BouncyCastle.Crypto.Xml
             SignedXmlDebugLog.LogVerificationResult(this, macAlg, true);
             return true;
         }
-        */
 
         public bool CheckSignature(X509Certificate certificate, bool verifySignatureOnly)
         {
@@ -431,46 +429,43 @@ namespace Org.BouncyCastle.Crypto.Xml
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
 
             signatureDescription.Init(true, key);
-            GetC14NDigest(signatureDescription);
+            GetC14NDigest(new SignerHashWrapper(signatureDescription));
 
             //SignedXmlDebugLog.LogSigning(this, key, signatureDescription, hashAlg, asymmetricSignatureFormatter);
             m_signature.SignatureValue = signatureDescription.GenerateSignature();
         }
 
-        // TODO: implement
-        /*
-        public void ComputeSignature(KeyedHashAlgorithm macAlg)
+        public void ComputeSignature(IMac macAlg)
         {
             if (macAlg == null)
                 throw new ArgumentNullException("macAlg");
 
-            HMAC hash = macAlg as HMAC;
-            if (hash == null)
+            if (!(macAlg is HMac))
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
 
             int signatureLength;
             if (m_signature.SignedInfo.SignatureLength == null)
-                signatureLength = hash.HashSize;
+                signatureLength = macAlg.GetMacSize() * 8;
             else
                 signatureLength = Convert.ToInt32(m_signature.SignedInfo.SignatureLength, null);
             // signatureLength should be less than hash size
-            if (signatureLength < 0 || signatureLength > hash.HashSize)
+            if (signatureLength < 0 || signatureLength > macAlg.GetMacSize() * 8)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength);
             if (signatureLength % 8 != 0)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength2);
 
             BuildDigestedReferences();
-            switch (hash.HashName) {
-                case "SHA1":
+            switch (macAlg.AlgorithmName.Substring(0, macAlg.AlgorithmName.IndexOf('/')).ToUpperInvariant()) {
+                case "SHA-1":
                     SignedInfo.SignatureMethod = SignedXml.XmlDsigHMACSHA1Url;
                     break;
-                case "SHA256":
+                case "SHA-256":
                     SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA256Url;
                     break;
-                case "SHA384":
+                case "SHA-384":
                     SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA384Url;
                     break;
-                case "SHA512":
+                case "SHA-512":
                     SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA512Url;
                     break;
                 case "MD5":
@@ -483,13 +478,14 @@ namespace Org.BouncyCastle.Crypto.Xml
                     throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
             }
 
-            byte[] hashValue = GetC14NDigest(hash);
+            GetC14NDigest(new MacHashWrapper(macAlg));
+            byte[] hashValue = new byte[macAlg.GetMacSize()];
+            macAlg.DoFinal(hashValue, 0);
 
-            SignedXmlDebugLog.LogSigning(this, hash);
+            SignedXmlDebugLog.LogSigning(this, macAlg);
             m_signature.SignatureValue = new byte[signatureLength / 8];
             Buffer.BlockCopy(hashValue, 0, m_signature.SignatureValue, 0, signatureLength / 8);
         }
-        */
 
         //
         // virtual methods
@@ -804,7 +800,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        private void GetC14NDigest(ISigner hash)
+        private void GetC14NDigest(IHash hash)
         {
             bool isKeyedHashAlgorithm = false;
             if (isKeyedHashAlgorithm || !_bCacheValid || !SignedInfo.CacheValid)
@@ -1047,7 +1043,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 return false;
             }
 
-            GetC14NDigest(signatureDescription);
+            GetC14NDigest(new SignerHashWrapper(signatureDescription));
 
             /*SignedXmlDebugLog.LogVerifySignedInfo(this,
                                                   key,
@@ -1058,6 +1054,40 @@ namespace Org.BouncyCastle.Crypto.Xml
                                                   m_signature.SignatureValue);*/
 
             return signatureDescription.VerifySignature(m_signature.SignatureValue);
+        }
+
+        private bool CheckSignedInfo(IMac macAlg)
+        {
+            if (macAlg == null)
+                throw new ArgumentNullException(nameof(macAlg));
+
+            SignedXmlDebugLog.LogBeginCheckSignedInfo(this, m_signature.SignedInfo);
+
+            int signatureLength;
+            if (m_signature.SignedInfo.SignatureLength == null)
+                signatureLength = macAlg.GetMacSize() * 8;
+            else
+                signatureLength = Convert.ToInt32(m_signature.SignedInfo.SignatureLength, null);
+
+            // signatureLength should be less than hash size
+            if (signatureLength < 0 || signatureLength > macAlg.GetMacSize() * 8)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength);
+            if (signatureLength % 8 != 0)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength2);
+            if (m_signature.SignatureValue == null)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureValueRequired);
+            if (m_signature.SignatureValue.Length != signatureLength / 8)
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength);
+
+            // Calculate the hash
+            GetC14NDigest(new MacHashWrapper(macAlg));
+            byte[] hashValue = new byte[macAlg.GetMacSize()];
+            macAlg.DoFinal(hashValue, 0);
+            //SignedXmlDebugLog.LogVerifySignedInfo(this, macAlg, hashValue, m_signature.SignatureValue);
+            for (int i = 0; i < m_signature.SignatureValue.Length; i++) {
+                if (m_signature.SignatureValue[i] != hashValue[i]) return false;
+            }
+            return true;
         }
 
         private static XmlElement GetSingleReferenceTarget(XmlDocument document, string idAttributeName, string idValue)

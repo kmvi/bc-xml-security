@@ -33,13 +33,13 @@ namespace Org.BouncyCastle.Crypto.Xml
                 strBuilder.Append(Utils.EscapeWhitespaceData(Value));
         }
 
-        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (IsInNodeSet && docPos == DocPosition.InRootElement)
             {
                 UTF8Encoding utf8 = new UTF8Encoding(false);
                 byte[] rgbData = utf8.GetBytes(Utils.EscapeWhitespaceData(Value));
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
             }
         }
     }

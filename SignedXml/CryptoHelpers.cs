@@ -99,6 +99,14 @@ namespace Org.BouncyCastle.Crypto.Xml
                     return DigestUtilities.GetDigest("GOST3411-2012-512");
                 case "http://www.w3.org/2001/04/xmldsig-more#hmac-md5":
                     return MacUtilities.GetMac("HMAC-MD5");
+                case "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256":
+                    return MacUtilities.GetMac("HMAC-SHA256");
+                case "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384":
+                    return MacUtilities.GetMac("HMAC-SHA384");
+                case "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512":
+                    return MacUtilities.GetMac("HMAC-SHA512");
+                case "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160":
+                    return MacUtilities.GetMac("HMAC-RIPEMD160");
                 case "http://www.w3.org/2001/04/xmlenc#des-cbc":
                     return CipherUtilities.GetCipher("DES/CBC/PKCS7Padding");
                 case "http://www.w3.org/2001/04/xmlenc#tripledes-cbc":

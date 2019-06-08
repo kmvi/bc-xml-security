@@ -40,19 +40,19 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        public static void WriteHash(XmlNode node, ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public static void WriteHash(XmlNode node, IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (node is ICanonicalizableNode)
             {
-                ((ICanonicalizableNode)node).WriteHash(signer, docPos, anc);
+                ((ICanonicalizableNode)node).WriteHash(hash, docPos, anc);
             }
             else
             {
-                WriteHashGenericNode(node, signer, docPos, anc);
+                WriteHashGenericNode(node, hash, docPos, anc);
             }
         }
 
-        public static void WriteHashGenericNode(XmlNode node, ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public static void WriteHashGenericNode(XmlNode node, IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (node == null)
                 throw new ArgumentNullException("node");
@@ -60,7 +60,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             XmlNodeList childNodes = node.ChildNodes;
             foreach (XmlNode childNode in childNodes)
             {
-                WriteHash(childNode, signer, docPos, anc);
+                WriteHash(childNode, hash, docPos, anc);
             }
         }
     }

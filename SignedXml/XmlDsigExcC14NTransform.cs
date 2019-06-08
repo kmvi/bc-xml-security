@@ -125,7 +125,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return new MemoryStream(_excCanonicalXml.GetBytes());
         }
 
-        public override void GetDigestedOutput(ISigner signer)
+        public override void GetDigestedOutput(IHash signer)
         {
             _excCanonicalXml.GetDigestedBytes(signer);
         }

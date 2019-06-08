@@ -62,7 +62,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return utf8.GetBytes(sb.ToString());
         }
 
-        internal void GetDigestedBytes(ISigner hash)
+        internal void GetDigestedBytes(IHash hash)
         {
             _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
         }

@@ -88,7 +88,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return new MemoryStream(_cXml.GetBytes());
         }
 
-        public override void GetDigestedOutput(ISigner hash)
+        public override void GetDigestedOutput(IHash hash)
         {
             _cXml.GetDigestedBytes(hash);
         }

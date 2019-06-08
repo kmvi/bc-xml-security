@@ -31,13 +31,13 @@ namespace Org.BouncyCastle.Crypto.Xml
                 strBuilder.Append(Utils.EscapeCData(Data));
         }
 
-        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (IsInNodeSet)
             {
                 UTF8Encoding utf8 = new UTF8Encoding(false);
                 byte[] rgbData = utf8.GetBytes(Utils.EscapeCData(Data));
-                signer.BlockUpdate(rgbData, 0, rgbData.Length);
+                hash.BlockUpdate(rgbData, 0, rgbData.Length);
             }
         }
     }

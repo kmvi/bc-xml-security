@@ -48,7 +48,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        public void WriteHash(ISigner signer, DocPosition docPos, AncestralNamespaceContextManager anc)
+        public void WriteHash(IHash signer, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             docPos = DocPosition.BeforeRootElement;
             foreach (XmlNode childNode in ChildNodes)

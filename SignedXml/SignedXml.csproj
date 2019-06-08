@@ -80,6 +80,7 @@
     <Compile Include="EncryptionPropertyCollection.cs" />
     <Compile Include="ExcAncestralNamespaceContextManager.cs" />
     <Compile Include="ExcCanonicalXml.cs" />
+    <Compile Include="HashWrappers.cs" />
     <Compile Include="ICanonicalizableNode.cs" />
     <Compile Include="IRelDecryptor.cs" />
     <Compile Include="KeyInfo.cs" />
