@@ -27,7 +27,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         // <configuration>
         //   <system.diagnostics>
         //     <sources>
-        //       <source name="System.Security.Cryptography.Xml.SignedXml"
+        //       <source name="Org.BouncyCastle.Crypto.Xml.SignedXml"
         //               switchName="XmlDsigLogSwitch">
         //         <listeners>
         //           <add name="logFile" />
@@ -53,7 +53,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         private const string NullString = "(null)";
 
-        private static TraceSource s_traceSource = new TraceSource("System.Security.Cryptography.Xml.SignedXml");
+        private static TraceSource s_traceSource = new TraceSource("Org.BouncyCastle.Crypto.Xml.SignedXml");
         private static volatile bool s_haveVerboseLogging;
         private static volatile bool s_verboseLogging;
         private static volatile bool s_haveInformationLogging;
