@@ -1033,9 +1033,9 @@ namespace Org.BouncyCastle.Crypto.Xml
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
 
             // Let's see if the key corresponds with the SignatureMethod 
-            ISigner ta = SignerUtilities.GetSigner(signatureDescription.AlgorithmName);
-            if (!IsKeyTheCorrectAlgorithm(key, ta))
-                return false;
+            //ISigner ta = SignerUtilities.GetSigner(signatureDescription.AlgorithmName);
+            //if (!IsKeyTheCorrectAlgorithm(key, ta))
+            //    return false;
 
             try {
                 signatureDescription.Init(false, key);

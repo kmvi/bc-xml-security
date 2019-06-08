@@ -28,6 +28,12 @@ namespace _SignedXml.Samples
             test3.SignedXmlHasCertificateVerifiableSignature();
 
             Console.WriteLine("----------------------------------------------------------------");
+            Console.WriteLine("Signature verification test using GOST algorithm");
+            Console.WriteLine("----------------------------------------------------------------");
+            var test3_1 = new SigningVerifyingGost();
+            test3_1.SignedXmlHasCertificateVerifiableSignature();
+
+            Console.WriteLine("----------------------------------------------------------------");
             Console.WriteLine("Encryption/decryption test using symmetric algorithms");
             Console.WriteLine("----------------------------------------------------------------");
             var test4 = new EncryptingAndDecryptingSymmetric();
