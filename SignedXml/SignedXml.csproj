@@ -103,11 +103,6 @@
     <Compile Include="RSAOAEPKeyExchangeFormatter.cs" />
     <Compile Include="RSAPKCS1KeyExchangeDeformatter.cs" />
     <Compile Include="RSAPKCS1KeyExchangeFormatter.cs" />
-    <Compile Include="RSAPKCS1SHA1SignatureDescription.cs" />
-    <Compile Include="RSAPKCS1SHA256SignatureDescription.cs" />
-    <Compile Include="RSAPKCS1SHA384SignatureDescription.cs" />
-    <Compile Include="RSAPKCS1SHA512SignatureDescription.cs" />
-    <Compile Include="RSAPKCS1SignatureDescription.cs" />
     <Compile Include="Signature.cs" />
     <Compile Include="SignedInfo.cs" />
     <Compile Include="SignedXml.cs" />
