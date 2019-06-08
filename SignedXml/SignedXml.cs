@@ -17,6 +17,7 @@ using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Security;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -416,9 +417,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 }
                 else if (key is RsaKeyParameters)
                 {
-                    // Default to RSA-SHA1
-                    if (SignedInfo.SignatureMethod == null)
-                        SignedInfo.SignatureMethod = XmlDsigRSASHA256Url;
+                    SignedInfo.SignatureMethod = XmlDsigRSASHA256Url;
                 }
                 else
                 {
@@ -1038,9 +1037,9 @@ namespace Org.BouncyCastle.Crypto.Xml
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureDescriptionNotCreated);
 
             // Let's see if the key corresponds with the SignatureMethod 
-            /*Type ta = Type.GetType(signatureDescription.KeyAlgorithm);
+            ISigner ta = SignerUtilities.GetSigner(signatureDescription.AlgorithmName);
             if (!IsKeyTheCorrectAlgorithm(key, ta))
-                return false;*/
+                return false;
 
             try {
                 signatureDescription.Init(false, key);
@@ -1091,38 +1090,15 @@ namespace Org.BouncyCastle.Crypto.Xml
             throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidReference);
         }
 
-        private static bool IsKeyTheCorrectAlgorithm(AsymmetricKeyParameter key, Type expectedType)
+        private static bool IsKeyTheCorrectAlgorithm(AsymmetricKeyParameter key, ISigner expectedType)
         {
-            Type actualType = key.GetType();
-
-            if (actualType == expectedType)
-                return true;
-
-            // This check exists solely for compatibility with 4.6. Normally, we would expect "expectedType" to be the superclass type and
-            // the actualType to be the subclass.
-            if (expectedType.IsSubclassOf(actualType))
-                return true;
-
-            //
-            // "expectedType" comes from the KeyAlgorithm property of a SignatureDescription. The BCL SignatureDescription classes have historically 
-            // denoted provider-specific implementations ("RSACryptoServiceProvider") rather than the base class for the algorithm ("RSA"). We could
-            // change those (at the risk of creating other compat problems) but we have no control over third party SignatureDescriptions.
-            //
-            // So, in the absence of a better approach, walk up the parent hierarchy until we find the ancestor that's a direct subclass of
-            // AsymmetricAlgorithm and treat that as the algorithm identifier.
-            //
-            while (expectedType != null && expectedType.BaseType != typeof(System.Security.Cryptography.AsymmetricAlgorithm))
-            {
-                expectedType = expectedType.BaseType;
+            try {
+                expectedType.Init(false, key);
+            } catch (Exception) {
+                return false;
             }
 
-            if (expectedType == null)
-                return false;   // SignatureDescription specified something that isn't even a subclass of AsymmetricAlgorithm. For compatibility with 4.6, return false rather throw.
-
-            if (actualType.IsSubclassOf(expectedType))
-                return true;
-
-            return false;
+            return true;
         }
     }
 }
