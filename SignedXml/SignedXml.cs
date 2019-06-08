@@ -276,6 +276,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             SignedXmlDebugLog.LogBeginSignatureVerification(this, _context);
 
+            int count = 0;
             signingKey = null;
             bool bRet = false;
             AsymmetricKeyParameter key = null;
@@ -290,6 +291,8 @@ namespace Org.BouncyCastle.Crypto.Xml
                 key = GetPublicKey();
                 if (key != null)
                 {
+                    if (count++ > 0)
+                        _bCacheValid = false;
                     bRet = CheckSignature(key);
                     SignedXmlDebugLog.LogVerificationResult(this, key, bRet);
                 }
