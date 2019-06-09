@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SignedXml")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("XML Security using Bouncy Castle")]
+[assembly: AssemblyDescription("Implementation of the XML Security standards using Bouncy Castle")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SignedXml")]
+[assembly: AssemblyProduct("bc-xml-security")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
