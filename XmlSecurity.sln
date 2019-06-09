@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignedXml", "SignedXml\SignedXml.csproj", "{3F7BAADF-7273-4B8F-A821-4B52419C1A2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlSecurity", "src\XmlSecurity.csproj", "{3F7BAADF-7273-4B8F-A821-4B52419C1A2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignedXml.Tests", "SignedXml.Tests\SignedXml.Tests.csproj", "{57C095D5-4314-4619-BA71-47A1B3E525CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlSecurity.Tests", "tests\XmlSecurity.Tests.csproj", "{57C095D5-4314-4619-BA71-47A1B3E525CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignedXml.Samples", "SignedXml.Samples\SignedXml.Samples.csproj", "{81C32527-CC52-4DFA-83A6-F57F671EF0B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlSecurity.Samples", "samples\XmlSecurity.Samples.csproj", "{81C32527-CC52-4DFA-83A6-F57F671EF0B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

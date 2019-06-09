@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Org.BouncyCastle.Crypto.Xml.Tests</RootNamespace>
-    <AssemblyName>SignedXml.Tests</AssemblyName>
+    <AssemblyName>XmlSecurity.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -164,9 +164,9 @@
     <Compile Include="XmlLicenseTransformTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SignedXml\SignedXml.csproj">
+    <ProjectReference Include="..\src\XmlSecurity.csproj">
       <Project>{3f7baadf-7273-4b8f-a821-4b52419c1a2b}</Project>
-      <Name>SignedXml</Name>
+      <Name>XmlSecurity</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
