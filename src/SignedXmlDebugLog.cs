@@ -2,14 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Org.BouncyCastle.X509;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 
@@ -215,37 +214,21 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             Debug.Assert(key != null, "key != null");
 
-            ICspAsymmetricAlgorithm cspKey = key as ICspAsymmetricAlgorithm;
+            AsymmetricKeyParameter cspKey = key as AsymmetricKeyParameter;
             X509Certificate certificate = key as X509Certificate;
-            X509Certificate2 certificate2 = key as X509Certificate2;
-
-            //
-            // Use the following sources for key names, if available:
-            //
-            // * CAPI key         -> key container name
-            // * X509Certificate2 -> subject simple name
-            // * X509Certificate  -> subject name
-            // * All others       -> hash code
-            //
 
             string keyName = null;
-            if (cspKey != null && cspKey.CspKeyContainerInfo.KeyContainerName != null)
+            if (cspKey != null)
             {
                 keyName = string.Format(CultureInfo.InvariantCulture,
                                         "\"{0}\"",
-                                        cspKey.CspKeyContainerInfo.KeyContainerName);
-            }
-            else if (certificate2 != null)
-            {
-                keyName = string.Format(CultureInfo.InvariantCulture,
-                                        "\"{0}\"",
-                                        certificate2.GetNameInfo(X509NameType.SimpleName, false));
+                                        cspKey.GetType().Name);
             }
             else if (certificate != null)
             {
                 keyName = string.Format(CultureInfo.InvariantCulture,
                                         "\"{0}\"",
-                                        certificate.Subject);
+                                        certificate.SubjectDN);
             }
             else
             {
@@ -265,20 +248,6 @@ namespace Org.BouncyCastle.Crypto.Xml
             return string.Format(CultureInfo.InvariantCulture,
                                  "{0}#{1}", o.GetType().Name,
                                  o.GetHashCode().ToString("x8", CultureInfo.InvariantCulture));
-        }
-
-        /// <summary>
-        ///     Map an OID to the friendliest name possible
-        /// </summary>
-        private static string GetOidName(Oid oid)
-        {
-            Debug.Assert(oid != null, "oid != null");
-
-            string friendlyName = oid.FriendlyName;
-            if (string.IsNullOrEmpty(friendlyName))
-                friendlyName = oid.Value;
-
-            return friendlyName;
         }
 
         /// <summary>
@@ -632,18 +601,12 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// <param name="signedXml">SignedXml object calculating the signature</param>
         /// <param name="key">key used for signing</param>
         /// <param name="signatureDescription">signature description being used to create the signature</param>
-        /// <param name="hash">hash algorithm used to digest the output</param>
-        /// <param name="asymmetricSignatureFormatter">signature formatter used to do the signing</param>
         internal static void LogSigning(SignedXml signedXml,
                                         object key,
-                                        SignatureDescription signatureDescription,
-                                        HashAlgorithm hash,
-                                        AsymmetricSignatureFormatter asymmetricSignatureFormatter)
+                                        ISigner signatureDescription)
         {
             Debug.Assert(signedXml != null, "signedXml != null");
             Debug.Assert(signatureDescription != null, "signatureDescription != null");
-            Debug.Assert(hash != null, "hash != null");
-            Debug.Assert(asymmetricSignatureFormatter != null, "asymmetricSignatureFormatter != null");
 
             if (InformationLoggingEnabled)
             {
@@ -651,8 +614,8 @@ namespace Org.BouncyCastle.Crypto.Xml
                                                   SR.Log_SigningAsymmetric,
                                                   GetKeyName(key),
                                                   signatureDescription.GetType().Name,
-                                                  hash.GetType().Name,
-                                                  asymmetricSignatureFormatter.GetType().Name);
+                                                  signatureDescription.AlgorithmName,
+                                                  "");
 
                 WriteLine(signedXml,
                           TraceEventType.Information,
@@ -765,7 +728,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// <param name="signedXml">SignedXml doing the signature verification</param>
         /// <param name="certificate">certificate having its key usages checked</param>
         /// <param name="keyUsages">key usages being examined</param>
-        internal static void LogVerifyKeyUsage(SignedXml signedXml, X509Certificate certificate, X509KeyUsageExtension keyUsages)
+        internal static void LogVerifyKeyUsage(SignedXml signedXml, X509Certificate certificate/*, X509KeyUsageExtension keyUsages*/)
         {
             Debug.Assert(signedXml != null, "signedXml != null");
             Debug.Assert(certificate != null, "certificate != null");
@@ -774,8 +737,8 @@ namespace Org.BouncyCastle.Crypto.Xml
             {
                 string logMessage = string.Format(CultureInfo.InvariantCulture,
                                                   SR.Log_KeyUsages,
-                                                  keyUsages.KeyUsages,
-                                                  GetOidName(keyUsages.Oid),
+                                                  /*keyUsages.KeyUsages*/ "",
+                                                  /*GetOidName(keyUsages.Oid)*/ "",
                                                   GetKeyName(certificate));
 
                 WriteLine(signedXml,
@@ -852,22 +815,16 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// <param name="signedXml">SignedXml object doing the verification</param>
         /// <param name="key">key being used to verify the signed info</param>
         /// <param name="signatureDescription">type of signature description class used</param>
-        /// <param name="hashAlgorithm">type of hash algorithm used</param>
-        /// <param name="asymmetricSignatureDeformatter">type of signature deformatter used</param>
         /// <param name="actualHashValue">hash value of the signed info</param>
         /// <param name="signatureValue">raw signature value</param>
         internal static void LogVerifySignedInfo(SignedXml signedXml,
-                                                 AsymmetricAlgorithm key,
-                                                 SignatureDescription signatureDescription,
-                                                 HashAlgorithm hashAlgorithm,
-                                                 AsymmetricSignatureDeformatter asymmetricSignatureDeformatter,
+                                                 AsymmetricKeyParameter key,
+                                                 ISigner signatureDescription,
                                                  byte[] actualHashValue,
                                                  byte[] signatureValue)
         {
             Debug.Assert(signedXml != null, "signedXml != null");
             Debug.Assert(signatureDescription != null, "signatureDescription != null");
-            Debug.Assert(hashAlgorithm != null, "hashAlgorithm != null");
-            Debug.Assert(asymmetricSignatureDeformatter != null, "asymmetricSignatureDeformatter != null");
 
             if (InformationLoggingEnabled)
             {
@@ -875,8 +832,8 @@ namespace Org.BouncyCastle.Crypto.Xml
                                                   SR.Log_VerifySignedInfoAsymmetric,
                                                   GetKeyName(key),
                                                   signatureDescription.GetType().Name,
-                                                  hashAlgorithm.GetType().Name,
-                                                  asymmetricSignatureDeformatter.GetType().Name);
+                                                  signatureDescription.AlgorithmName,
+                                                  "");
                 WriteLine(signedXml,
                           TraceEventType.Information,
                           SignedXmlDebugEvent.VerifySignedInfo,
@@ -906,7 +863,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// <param name="actualHashValue">hash value of the signed info</param>
         /// <param name="signatureValue">raw signature value</param>
         internal static void LogVerifySignedInfo(SignedXml signedXml,
-                                                 KeyedHashAlgorithm mac,
+                                                 IMac mac,
                                                  byte[] actualHashValue,
                                                  byte[] signatureValue)
         {
@@ -944,7 +901,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// <param name="signedXml">SignedXml object building the chain</param>
         /// <param name="chain">chain built for the certificate</param>
         /// <param name="certificate">certificate having the chain built for it</param>
-        internal static void LogVerifyX509Chain(SignedXml signedXml, X509Chain chain, X509Certificate certificate)
+        /*internal static void LogVerifyX509Chain(SignedXml signedXml, IList<X509Certificate> chain, X509Certificate certificate)
         {
             Debug.Assert(signedXml != null, "signedXml != null");
             Debug.Assert(certificate != null, "certificate != null");
@@ -1016,9 +973,9 @@ namespace Org.BouncyCastle.Crypto.Xml
                 StringBuilder chainElements = new StringBuilder();
                 chainElements.Append(SR.Log_CertificateChain);
 
-                foreach (X509ChainElement element in chain.ChainElements)
+                foreach (X509Certificate element in chain)
                 {
-                    chainElements.AppendFormat(CultureInfo.InvariantCulture, " {0}", GetKeyName(element.Certificate));
+                    chainElements.AppendFormat(CultureInfo.InvariantCulture, " {0}", GetKeyName(element));
                 }
 
                 WriteLine(signedXml,
@@ -1026,7 +983,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                           SignedXmlDebugEvent.X509Verification,
                           chainElements.ToString());
             }
-        }
+        }*/
 
         /// <summary>
         /// Write information when user hits the Signed XML recursion depth limit issue.

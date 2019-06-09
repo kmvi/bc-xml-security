@@ -431,7 +431,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             signatureDescription.Init(true, key);
             GetC14NDigest(new SignerHashWrapper(signatureDescription));
 
-            //SignedXmlDebugLog.LogSigning(this, key, signatureDescription, hashAlg, asymmetricSignatureFormatter);
+            SignedXmlDebugLog.LogSigning(this, key, signatureDescription);
             m_signature.SignatureValue = signatureDescription.GenerateSignature();
         }
 
@@ -1083,7 +1083,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             GetC14NDigest(new MacHashWrapper(macAlg));
             byte[] hashValue = new byte[macAlg.GetMacSize()];
             macAlg.DoFinal(hashValue, 0);
-            //SignedXmlDebugLog.LogVerifySignedInfo(this, macAlg, hashValue, m_signature.SignatureValue);
+            SignedXmlDebugLog.LogVerifySignedInfo(this, macAlg, hashValue, m_signature.SignatureValue);
             for (int i = 0; i < m_signature.SignatureValue.Length; i++) {
                 if (m_signature.SignatureValue[i] != hashValue[i]) return false;
             }
