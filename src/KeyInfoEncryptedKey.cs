@@ -5,8 +5,6 @@
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 
@@ -32,14 +30,14 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override XmlElement GetXml()
         {
             if (_encryptedKey == null)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidElement, "KeyInfoEncryptedKey");
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "KeyInfoEncryptedKey");
             return _encryptedKey.GetXml();
         }
 
         internal override XmlElement GetXml(XmlDocument xmlDocument)
         {
             if (_encryptedKey == null)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidElement, "KeyInfoEncryptedKey");
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "KeyInfoEncryptedKey");
             return _encryptedKey.GetXml(xmlDocument);
         }
 

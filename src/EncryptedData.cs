@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Security.Cryptography;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -41,7 +40,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             // CipherData
             XmlNode cipherDataNode = value.SelectSingleNode("enc:CipherData", nsm);
             if (cipherDataNode == null)
-                throw new CryptographicException(SR.Cryptography_Xml_MissingCipherData);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingCipherData);
 
             CipherData = new CipherData();
             CipherData.LoadXml(cipherDataNode as XmlElement);
@@ -101,7 +100,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             // CipherData is required.
             if (CipherData == null)
-                throw new CryptographicException(SR.Cryptography_Xml_MissingCipherData);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_MissingCipherData);
             encryptedDataElement.AppendChild(CipherData.GetXml(document));
 
             // EncryptionProperties

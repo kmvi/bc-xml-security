@@ -2,7 +2,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Xml;
-using System.Security.Cryptography.X509Certificates;
 using Xunit;
 
 namespace Org.BouncyCastle.Crypto.Xml.Tests

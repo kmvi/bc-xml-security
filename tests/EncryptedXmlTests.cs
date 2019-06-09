@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Globalization;
-using System.Security.Cryptography.X509Certificates;
 using System.Xml;
 using Xunit;
 

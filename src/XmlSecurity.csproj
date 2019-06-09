@@ -69,7 +69,6 @@
     <Compile Include="DocPosition.cs" />
     <Compile Include="DsaDigestSigner2.cs" />
     <Compile Include="DSAKeyValue.cs" />
-    <Compile Include="DSASignatureDescription.cs" />
     <Compile Include="EncryptedData.cs" />
     <Compile Include="EncryptedKey.cs" />
     <Compile Include="EncryptedReference.cs" />

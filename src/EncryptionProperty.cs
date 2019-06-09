@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Security.Cryptography;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -24,7 +23,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (elementProperty == null)
                 throw new ArgumentNullException("elementProperty");
             if (elementProperty.LocalName != "EncryptionProperty" || elementProperty.NamespaceURI != EncryptedXml.XmlEncNamespaceUrl)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidEncryptionProperty);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidEncryptionProperty);
 
             _elemProp = elementProperty;
             _cachedXml = null;
@@ -48,7 +47,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 if (value == null)
                     throw new ArgumentNullException("value");
                 if (value.LocalName != "EncryptionProperty" || value.NamespaceURI != EncryptedXml.XmlEncNamespaceUrl)
-                    throw new CryptographicException(SR.Cryptography_Xml_InvalidEncryptionProperty);
+                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidEncryptionProperty);
 
                 _elemProp = value;
                 _cachedXml = null;
@@ -82,7 +81,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (value == null)
                 throw new ArgumentNullException("value");
             if (value.LocalName != "EncryptionProperty" || value.NamespaceURI != EncryptedXml.XmlEncNamespaceUrl)
-                throw new CryptographicException(SR.Cryptography_Xml_InvalidEncryptionProperty);
+                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidEncryptionProperty);
 
             // cache the Xml
             _cachedXml = value;
