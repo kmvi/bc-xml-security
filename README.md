@@ -1,8 +1,14 @@
-# bc-signedxml
+# bc-xml-security
 
-XML Signature and XML Encryption using Bouncy Castle (adapted from [corefx](https://github.com/dotnet/corefx/tree/master/src/System.Security.Cryptography.Xml) sources)
+Implementation of the [XML Security standards](https://www.w3.org/standards/xml/security) using [Bouncy Castle](http://www.bouncycastle.org/csharp):
+- XML Signature Syntax and Processing
+- XML Encryption Syntax and Processing
+
+Adapted from [corefx](https://github.com/dotnet/corefx/tree/master/src/System.Security.Cryptography.Xml) sources.
 
 ### Example
+
+See [samples folder](https://github.com/kmvi/bc-xml-security/tree/master/samples)
 
 ```csharp
 // Load certificate and private key form PKCS12 container
@@ -15,14 +21,14 @@ var privKey = store.GetKey(alias).Key;
 
 // Element to sign
 var doc = new XmlDocument();
-doc.LoadXml("<a id=\"aaa\">test</a>");
+doc.LoadXml("<a id=\"test\">some test node</a>");
 
 var sgn = new SignedXml(doc);
 var rf = new Reference();
 rf.AddTransform(new XmlDsigEnvelopedSignatureTransform());
 rf.AddTransform(new XmlDsigC14NTransform());
 rf.DigestMethod = SignedXml.XmlDsigSHA1Url;
-rf.Uri = "#aaa";
+rf.Uri = "#test";
 
 sgn.SignedInfo.CanonicalizationMethod = SignedXml.XmlDsigExcC14NTransformUrl;
 sgn.AddReference(rf);
