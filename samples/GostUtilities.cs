@@ -103,6 +103,9 @@ namespace _SignedXml.Samples
             generator.SetNotAfter(DateTime.Today.AddYears(1));
             generator.SetPublicKey(keypair.Public);
 
+            var keyUsage = new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.NonRepudiation);
+            generator.AddExtension(X509Extensions.KeyUsage, true, keyUsage);
+
             var signFactory = new GostSignatureFactory(
                 RosstandartObjectIdentifiers.id_tc26_signwithdigest_gost_3410_12_512.ToString(),
                 keypair.Private);

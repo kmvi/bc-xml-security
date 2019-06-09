@@ -353,14 +353,13 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (!verifySignatureOnly)
             {
                 // Check key usages to make sure it is good for signing.
-                
                 var exts = certificate.CertificateStructure.TbsCertificate.Extensions;
                 foreach (DerObjectIdentifier extension in exts.ExtensionOids)
                 {
                     if (extension.Equals(X509Extensions.KeyUsage))
                     {
                         var keyUsage = certificate.GetKeyUsage();
-                        bool validKeyUsage = (keyUsage[0 /* DigitalSignature */] || keyUsage[0 /* NonRepudiation */]);
+                        bool validKeyUsage = (keyUsage[0 /* DigitalSignature */] || keyUsage[1 /* NonRepudiation */]);
 
                         if (!validKeyUsage)
                         {
