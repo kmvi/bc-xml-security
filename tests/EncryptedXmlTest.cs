@@ -58,18 +58,6 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             Assert.Equal(DefaultXmlDSigSearchDepth, encryptedXml.XmlDSigSearchDepth);
         }
 
-        [Fact]
-        public void Constructor_XmlDocumentAndEvidence()
-        {
-            EncryptedXml encryptedXml = new EncryptedXml(null, null);
-            Assert.Equal(DefaultEncoding, encryptedXml.Encoding);
-            Assert.Equal(DefaultCipherMode, encryptedXml.Mode);
-            Assert.Equal(DefaultPaddingMode, encryptedXml.Padding);
-            Assert.Equal(DefaultRecipient, encryptedXml.Recipient);
-            Assert.Equal(DefaultXmlResolver, encryptedXml.Resolver);
-            Assert.Equal(DefaultXmlDSigSearchDepth, encryptedXml.XmlDSigSearchDepth);
-        }
-
         [Theory]
         [InlineData("Org.BouncyCastle.Crypto.Xml.Tests.EncryptedXmlSample1.xml")]
         [InlineData("Org.BouncyCastle.Crypto.Xml.Tests.EncryptedXmlSample3.xml")]
