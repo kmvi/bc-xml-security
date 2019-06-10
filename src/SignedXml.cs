@@ -801,7 +801,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         private void GetC14NDigest(IHash hash)
         {
-            bool isKeyedHashAlgorithm = false;
+            bool isKeyedHashAlgorithm = hash is MacHashWrapper;
             if (isKeyedHashAlgorithm || !_bCacheValid || !SignedInfo.CacheValid)
             {
                 string baseUri = (_containingDocument == null ? null : _containingDocument.BaseURI);
