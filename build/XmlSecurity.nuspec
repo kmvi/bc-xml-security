@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>bc-xml-security</id>
+    <version>1.0.1-beta</version>
+    <title>XML Security using Bouncy Castle</title>
+    <authors>kmvi</authors>
+    <license type="expression">MIT</license>
+    <repository type="git" url="https://github.com/kmvi/bc-xml-security" />
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Implementation of the XML Security standards using Bouncy Castle</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>bouncycastle xml-security xml-encryption xml-signature</tags>
+    <dependencies>
+      <dependency id="BouncyCastle" version="1.8.5" />
+    </dependencies>
+  </metadata>
+</package>
