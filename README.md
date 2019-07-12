@@ -1,10 +1,12 @@
 # bc-xml-security
 
-Implementation of the [XML Security standards](https://www.w3.org/standards/xml/security) using [Bouncy Castle](http://www.bouncycastle.org/csharp):
+Implementation of the [XML Security standards](https://www.w3.org/standards/xml/security) using [portable version of Bouncy Castle](https://github.com/onovotny/bc-csharp):
 - XML Signature Syntax and Processing
 - XML Encryption Syntax and Processing
 
 Adapted from [corefx](https://github.com/dotnet/corefx/tree/master/src/System.Security.Cryptography.Xml) sources.
+
+For portable version see [portable branch](../../tree/portable) (.NET Standard 2.0).
 
 ### Example
 
