@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using System.Globalization;
 using System.Runtime.Versioning;
+using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -347,6 +348,11 @@ namespace Org.BouncyCastle.Crypto.Xml
                 IMac mac = CryptoHelpers.CreateFromName<IMac>(_digestMethod);
                 if (mac == null)
                     throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_CreateHashAlgorithmFailed);
+
+                // For compatibility to corefx' HMAC implementation
+                byte[] randomKey = Utils.GenerateRandomBlock(mac.GetMacSize());
+                mac.Init(new KeyParameter(randomKey));
+
                 _hashAlgorithm = new MacHashWrapper(mac);
             }
             else

@@ -83,6 +83,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 case "http://www.w3.org/2001/04/xmlenc#sha256":
                     return DigestUtilities.GetDigest("SHA-256");
                 case "http://www.w3.org/2001/04/xmldsig-more#sha384":
+                case "SHA384":
                     return DigestUtilities.GetDigest("SHA-384");
                 case "http://www.w3.org/2001/04/xmlenc#sha512":
                     return DigestUtilities.GetDigest("SHA-512");

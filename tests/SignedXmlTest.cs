@@ -1367,7 +1367,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         [Fact]
         public void VerifyHMAC_SHA384()
         {
-            string xml = "<?xml version=\"1.0\" encoding=\"Windows-1252\"?><foo><Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\"><SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\" /><SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#hmac-sha384\" /><Reference URI=\"\"><Transforms><Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\" /></Transforms><DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#sha384\" /><DigestValue>kH9C0LeZocNVXhjfzpz00M5fc3WJf0QU8gxK4I7pAN7HN602yHo8yYDSlG14b5YS</DigestValue></Reference></SignedInfo><SignatureValue>LgydOfhv8nqpFLFPC+xg3ZnjC8D+V3mpzxv6GOdH1HDdw1r+LH/BFM2U7dntxgf0</SignatureValue></Signature></foo>";
+            string xml = "<?xml version=\"1.0\" encoding=\"Windows-1252\"?><foo><Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\"><SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315\" /><SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#hmac-sha384\" /><Reference URI=\"\"><Transforms><Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\" /></Transforms><DigestMethod Algorithm=\"SHA384\" /><DigestValue>kH9C0LeZocNVXhjfzpz00M5fc3WJf0QU8gxK4I7pAN7HN602yHo8yYDSlG14b5YS</DigestValue></Reference></SignedInfo><SignatureValue>LgydOfhv8nqpFLFPC+xg3ZnjC8D+V3mpzxv6GOdH1HDdw1r+LH/BFM2U7dntxgf0</SignatureValue></Signature></foo>";
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(xml);
 
