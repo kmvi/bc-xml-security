@@ -211,7 +211,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 CanonicalXmlNodeList namespaces = null;
                 if (reference != null)
                     namespaces = reference._namespaces;
-                else if (signedXml != null && signedXml._context != null)
+                else if (signedXml?._context != null)
                     namespaces = Utils.GetPropagatedAttributes(signedXml._context);
 
                 // if no namespaces have been propagated, return an empty hashtable.

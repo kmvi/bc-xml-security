@@ -121,14 +121,14 @@ namespace Org.BouncyCastle.Crypto.Xml
         public SignedXml(XmlDocument document)
         {
             if (document == null)
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(document));
             Initialize(document.DocumentElement);
         }
 
         public SignedXml(XmlElement elem)
         {
             if (elem == null)
-                throw new ArgumentNullException("elem");
+                throw new ArgumentNullException(nameof(elem));
             Initialize(elem);
         }
 
@@ -242,7 +242,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             m_signature.LoadXml(value);
 
@@ -330,16 +330,19 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public bool CheckSignature(IMac macAlg)
         {
-            if (!CheckSignatureFormat()) {
+            if (!CheckSignatureFormat())
+            {
                 return false;
             }
 
-            if (!CheckSignedInfo(macAlg)) {
+            if (!CheckSignedInfo(macAlg))
+            {
                 SignedXmlDebugLog.LogVerificationFailure(this, SR.Log_VerificationFailed_SignedInfo);
                 return false;
             }
 
-            if (!CheckDigestedReferences()) {
+            if (!CheckDigestedReferences())
+            {
                 SignedXmlDebugLog.LogVerificationFailure(this, SR.Log_VerificationFailed_References);
                 return false;
             }
@@ -437,7 +440,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void ComputeSignature(IMac macAlg)
         {
             if (macAlg == null)
-                throw new ArgumentNullException("macAlg");
+                throw new ArgumentNullException(nameof(macAlg));
 
             if (!(macAlg is HMac))
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
@@ -1023,7 +1026,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private bool CheckSignedInfo(AsymmetricKeyParameter key)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             SignedXmlDebugLog.LogBeginCheckSignedInfo(this, m_signature.SignedInfo);
 

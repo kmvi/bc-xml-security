@@ -78,11 +78,11 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     int i = 0;
                     int j = 0;
-                    while ((j < bytesRead) && (!Char.IsWhiteSpace((char)buffer[j]))) j++;
+                    while ((j < bytesRead) && (!char.IsWhiteSpace((char)buffer[j]))) j++;
                     i = j; j++;
                     while (j < bytesRead)
                     {
-                        if (!Char.IsWhiteSpace((char)buffer[j]))
+                        if (!char.IsWhiteSpace((char)buffer[j]))
                         {
                             buffer[i] = buffer[j];
                             i++;
@@ -109,11 +109,11 @@ namespace Org.BouncyCastle.Crypto.Xml
             byte[] buffer = utf8.GetBytes(sb.ToString());
             int i = 0;
             int j = 0;
-            while ((j < buffer.Length) && (!Char.IsWhiteSpace((char)buffer[j]))) j++;
+            while ((j < buffer.Length) && (!char.IsWhiteSpace((char)buffer[j]))) j++;
             i = j; j++;
             while (j < buffer.Length)
             {
-                if (!Char.IsWhiteSpace((char)buffer[j]))
+                if (!char.IsWhiteSpace((char)buffer[j]))
                 {
                     buffer[i] = buffer[j];
                     i++;
@@ -132,7 +132,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override object GetOutput(Type type)
         {
             if (type != typeof(Stream) && !type.IsSubclassOf(typeof(Stream)))
-                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
             return _cs;
         }
     }

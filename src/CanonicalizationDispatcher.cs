@@ -31,7 +31,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static void WriteGenericNode(XmlNode node, StringBuilder strBuilder, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (node == null)
-                throw new ArgumentNullException("node");
+                throw new ArgumentNullException(nameof(node));
 
             XmlNodeList childNodes = node.ChildNodes;
             foreach (XmlNode childNode in childNodes)
@@ -55,7 +55,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static void WriteHashGenericNode(XmlNode node, IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (node == null)
-                throw new ArgumentNullException("node");
+                throw new ArgumentNullException(nameof(node));
 
             XmlNodeList childNodes = node.ChildNodes;
             foreach (XmlNode childNode in childNodes)

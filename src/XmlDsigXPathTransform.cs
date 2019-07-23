@@ -63,11 +63,14 @@ namespace Org.BouncyCastle.Crypto.Xml
                             throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                         }
                         // Look for a namespace in the attributes
-                        foreach (XmlAttribute attrib in elem.Attributes) {
-                            if (attrib.Prefix == "xmlns") {
+                        foreach (XmlAttribute attrib in elem.Attributes)
+                        {
+                            if (attrib.Prefix == "xmlns")
+                            {
                                 prefix = attrib.LocalName;
                                 namespaceURI = attrib.Value;
-                                if (prefix == null) {
+                                if (prefix == null)
+                                {
                                     prefix = elem.Prefix;
                                     namespaceURI = elem.NamespaceURI;
                                 }
@@ -195,7 +198,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override object GetOutput(Type type)
         {
             if (type != typeof(XmlNodeList) && !type.IsSubclassOf(typeof(XmlNodeList)))
-                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
             return (XmlNodeList)GetOutput();
         }
     }

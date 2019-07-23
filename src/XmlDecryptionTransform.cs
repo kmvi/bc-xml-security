@@ -87,7 +87,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddExceptUri(string uri)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
             ExceptUris.Add(uri);
         }
 
@@ -99,18 +99,23 @@ namespace Org.BouncyCastle.Crypto.Xml
             foreach (XmlNode node in nodeList)
             {
                 XmlElement elem = node as XmlElement;
-                if (elem != null) {
-                    if (elem.LocalName == "Except" && elem.NamespaceURI == XmlDecryptionTransformNamespaceUrl) {
+                if (elem != null)
+                {
+                    if (elem.LocalName == "Except" && elem.NamespaceURI == XmlDecryptionTransformNamespaceUrl)
+                    {
                         // the Uri is required
                         string uri = Utils.GetAttribute(elem, "URI", XmlDecryptionTransformNamespaceUrl);
                         if (uri == null || uri.Length == 0 || uri[0] != '#')
                             throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriRequired);
-                        if (!Utils.VerifyAttributes(elem, "URI")) {
+                        if (!Utils.VerifyAttributes(elem, "URI"))
+                        {
                             throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                         }
                         string idref = Utils.ExtractIdFromLocalUri(uri);
                         ExceptUris.Add(idref);
-                    } else {
+                    }
+                    else
+                    {
                         throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                     }
                 }
@@ -163,7 +168,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private void LoadXmlDocumentInput(XmlDocument document)
         {
             if (document == null)
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(document));
             _containingDocument = document;
             _nsm = new XmlNamespaceManager(document.NameTable);
             _nsm.AddNamespace("enc", EncryptedXml.XmlEncNamespaceUrl);
@@ -272,7 +277,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (type == typeof(XmlDocument))
                 return (XmlDocument)GetOutput();
             else
-                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
         }
     }
 }

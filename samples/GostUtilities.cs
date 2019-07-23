@@ -39,11 +39,11 @@ namespace _SignedXml.Samples
             public GostSignatureFactory(string algorithm, AsymmetricKeyParameter privateKey, SecureRandom random)
             {
                 if (algorithm == null)
-                    throw new ArgumentNullException("algorithm");
+                    throw new ArgumentNullException(nameof(algorithm));
                 if (privateKey == null)
-                    throw new ArgumentNullException("privateKey");
+                    throw new ArgumentNullException(nameof(privateKey));
                 if (!privateKey.IsPrivate)
-                    throw new ArgumentException("Key for signing must be private", "privateKey");
+                    throw new ArgumentException("Key for signing must be private", nameof(privateKey));
 
                 this.algorithm = algorithm;
                 this.privateKey = privateKey;

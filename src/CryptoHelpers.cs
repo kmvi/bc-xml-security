@@ -9,7 +9,6 @@ using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -17,8 +16,8 @@ namespace Org.BouncyCastle.Crypto.Xml
     {
         private static readonly char[] _invalidChars = new char[] { ',', '`', '[', '*', '&' };
 
-        [SuppressMessage("Microsoft.Security", "CA5350", Justification = "SHA1 needed for compat.")]
-        [SuppressMessage("Microsoft.Security", "CA5351", Justification = "HMACMD5 needed for compat.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5350", Justification = "SHA1 needed for compat.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5351", Justification = "HMACMD5 needed for compat.")]
         public static object CreateFromKnownName(string name)
         {
             switch (name)
@@ -128,12 +127,16 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         public static T CreateFromName<T>(string name) where T : class
         {
-            if (name == null || name.IndexOfAny(_invalidChars) >= 0) {
+            if (name == null || name.IndexOfAny(_invalidChars) >= 0)
+            {
                 return null;
             }
-            try {
+            try
+            {
                 return CreateFromKnownName(name) as T;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 return null;
             }
         }

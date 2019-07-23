@@ -71,7 +71,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             XmlElement retrievalMethodElement = value;
             _uri = Utils.GetAttribute(value, "URI", SignedXml.XmlDsigNamespaceUrl);

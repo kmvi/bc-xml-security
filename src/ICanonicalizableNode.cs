@@ -21,6 +21,6 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
 
         void Write(StringBuilder strBuilder, DocPosition docPos, AncestralNamespaceContextManager anc);
-        void WriteHash(IHash signer, DocPosition docPos, AncestralNamespaceContextManager anc);
+        void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc);
     }
 }

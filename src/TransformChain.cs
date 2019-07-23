@@ -58,7 +58,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             get
             {
                 if (index >= _transforms.Count)
-                    throw new ArgumentException(SR.ArgumentOutOfRange_Index, "index");
+                    throw new ArgumentException(SR.ArgumentOutOfRange_Index, nameof(index));
                 return (Transform)_transforms[index];
             }
         }
@@ -186,7 +186,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             XmlNamespaceManager nsm = new XmlNamespaceManager(value.OwnerDocument.NameTable);
             nsm.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);

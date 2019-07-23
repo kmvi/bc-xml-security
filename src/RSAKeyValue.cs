@@ -102,7 +102,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
             if (value.LocalName != KeyValueElementName
                 || value.NamespaceURI != SignedXml.XmlDsigNamespaceUrl)

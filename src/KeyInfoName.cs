@@ -56,7 +56,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             XmlElement nameElement = value;
             _keyName = nameElement.InnerText.Trim();
         }

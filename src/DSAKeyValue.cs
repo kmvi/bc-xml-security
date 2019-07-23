@@ -142,7 +142,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
             if (value.Name != KeyValueElementName
                 || value.NamespaceURI != SignedXml.XmlDsigNamespaceUrl)
@@ -192,7 +192,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             catch (Exception ex)
             {
-                throw new System.Security.Cryptography.CryptographicException("An error occurred parsing the key components", ex);
+                throw new System.Security.Cryptography.CryptographicException($"An error occurred parsing the key components", ex);
             }
         }
     }

@@ -16,7 +16,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 {
     public class KeyInfoX509Data : KeyInfoClause
     {
-        // An array of certificates representing the certificate chain 
+        // An array of certificates representing the certificate chain
         private ArrayList _certificates = null;
         // An array of issuer serial structs
         private ArrayList _issuerSerials = null;
@@ -49,7 +49,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public KeyInfoX509Data(X509Certificate cert, IEnumerable<X509Certificate> additional, X509IncludeOption includeOption)
         {
             if (cert == null)
-                throw new ArgumentNullException("cert");
+                throw new ArgumentNullException(nameof(cert));
 
             X509Certificate certificate = Utils.CloneCertificate(cert);
             IList<X509Certificate> chain = null;
@@ -105,7 +105,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddCertificate(X509Certificate certificate)
         {
             if (certificate == null)
-                throw new ArgumentNullException("certificate");
+                throw new ArgumentNullException(nameof(certificate));
 
             if (_certificates == null)
                 _certificates = new ArrayList();
@@ -153,16 +153,19 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddIssuerSerial(string issuerName, string serialNumber)
         {
             if (string.IsNullOrEmpty(issuerName))
-                throw new ArgumentException(SR.Arg_EmptyOrNullString, "issuerName");
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, nameof(issuerName));
 
             if (string.IsNullOrEmpty(serialNumber))
-                throw new ArgumentException(SR.Arg_EmptyOrNullString, "serialNumber");
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, nameof(serialNumber));
 
             BigInteger h;
-            try {
+            try
+            {
                 h = new BigInteger(serialNumber);
-            } catch (Exception) {
-                throw new ArgumentException(SR.Cryptography_Xml_InvalidX509IssuerSerialNumber, "serialNumber");
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException(SR.Cryptography_Xml_InvalidX509IssuerSerialNumber, nameof(serialNumber));
             }
 
             if (_issuerSerials == null)
@@ -270,7 +273,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override void LoadXml(XmlElement element)
         {
             if (element == null)
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
 
             XmlNamespaceManager nsm = new XmlNamespaceManager(element.OwnerDocument.NameTable);
             nsm.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);

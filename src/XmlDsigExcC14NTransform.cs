@@ -96,7 +96,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 _excCanonicalXml = new ExcCanonicalXml((XmlNodeList)obj, _includeComments, _inclusiveNamespacesPrefixList, resolver);
             }
             else
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "obj");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(obj));
         }
 
         protected override XmlNodeList GetInnerXml()
@@ -121,7 +121,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override object GetOutput(Type type)
         {
             if (type != typeof(Stream) && !type.IsSubclassOf(typeof(Stream)))
-                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
             return new MemoryStream(_excCanonicalXml.GetBytes());
         }
 

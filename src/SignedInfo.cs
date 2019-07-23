@@ -204,7 +204,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             // SignedInfo
             XmlElement signedInfoElement = value;
@@ -281,7 +281,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddReference(Reference reference)
         {
             if (reference == null)
-                throw new ArgumentNullException("reference");
+                throw new ArgumentNullException(nameof(reference));
 
             reference.SignedXml = SignedXml;
             _references.Add(reference);
