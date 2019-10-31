@@ -2,10 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Xml;
-using System.IO;
-using System.Text;
 using System.Collections;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -15,8 +12,8 @@ namespace Org.BouncyCastle.Crypto.Xml
     // the XmlElement as the owner, but are not rendered.
     internal class NamespaceFrame
     {
-        private Hashtable _rendered = new Hashtable();
-        private Hashtable _unrendered = new Hashtable();
+        private readonly Hashtable _rendered = new Hashtable();
+        private readonly Hashtable _unrendered = new Hashtable();
 
         internal NamespaceFrame() { }
 

@@ -2,11 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Xml;
-using System.IO;
 using System.Text;
-using System.Collections;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -14,7 +11,7 @@ namespace Org.BouncyCastle.Crypto.Xml
     internal class CanonicalXmlComment : XmlComment, ICanonicalizableNode
     {
         private bool _isInNodeSet;
-        private bool _includeComments;
+        private readonly bool _includeComments;
 
         public CanonicalXmlComment(string comment, XmlDocument doc, bool defaultNodeSetInclusionState, bool includeComments)
             : base(comment, doc)

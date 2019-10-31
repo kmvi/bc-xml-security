@@ -2,23 +2,18 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
-using System.IO;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Xml;
-using Microsoft.Win32;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Crypto.Macs;
+using System;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -361,7 +356,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     if (extension.Equals(X509Extensions.KeyUsage))
                     {
-                        var keyUsage = certificate.GetKeyUsage();
+                        bool[] keyUsage = certificate.GetKeyUsage();
                         bool validKeyUsage = (keyUsage[0 /* DigitalSignature */] || keyUsage[1 /* NonRepudiation */]);
 
                         if (!validKeyUsage)
@@ -457,29 +452,16 @@ namespace Org.BouncyCastle.Crypto.Xml
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidSignatureLength2);
 
             BuildDigestedReferences();
-            switch (macAlg.AlgorithmName.Substring(0, macAlg.AlgorithmName.IndexOf('/')).ToUpperInvariant()) {
-                case "SHA-1":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigHMACSHA1Url;
-                    break;
-                case "SHA-256":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA256Url;
-                    break;
-                case "SHA-384":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA384Url;
-                    break;
-                case "SHA-512":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACSHA512Url;
-                    break;
-                case "MD5":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACMD5Url;
-                    break;
-                case "RIPEMD160":
-                    SignedInfo.SignatureMethod = SignedXml.XmlDsigMoreHMACRIPEMD160Url;
-                    break;
-                default:
-                    throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch);
-            }
-
+            SignedInfo.SignatureMethod = (macAlg.AlgorithmName.Substring(0, macAlg.AlgorithmName.IndexOf('/')).ToUpperInvariant()) switch
+            {
+                "SHA-1" => SignedXml.XmlDsigHMACSHA1Url,
+                "SHA-256" => SignedXml.XmlDsigMoreHMACSHA256Url,
+                "SHA-384" => SignedXml.XmlDsigMoreHMACSHA384Url,
+                "SHA-512" => SignedXml.XmlDsigMoreHMACSHA512Url,
+                "MD5" => SignedXml.XmlDsigMoreHMACMD5Url,
+                "RIPEMD160" => SignedXml.XmlDsigMoreHMACRIPEMD160Url,
+                _ => throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_SignatureMethodKeyMismatch),
+            };
             GetC14NDigest(new MacHashWrapper(macAlg));
             byte[] hashValue = new byte[macAlg.GetMacSize()];
             macAlg.DoFinal(hashValue, 0);
@@ -972,8 +954,8 @@ namespace Org.BouncyCastle.Crypto.Xml
 
         // Methods _must_ be marked both No Inlining and No Optimization to be fully opted out of optimization.
         // This is because if a candidate method is inlined, its method level attributes, including the NoOptimization
-        // attribute, are lost. 
-        // This method makes no attempt to disguise the length of either of its inputs. It is assumed the attacker has 
+        // attribute, are lost.
+        // This method makes no attempt to disguise the length of either of its inputs. It is assumed the attacker has
         // knowledge of the algorithms used, and thus the output length. Length is difficult to properly blind in modern CPUs.
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         private static bool CryptographicEquals(byte[] a, byte[] b)

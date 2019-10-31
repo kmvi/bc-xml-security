@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -51,7 +50,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return GetXml(document);
         }
 
-        new internal XmlElement GetXml(XmlDocument document)
+        internal new XmlElement GetXml(XmlDocument document)
         {
             if (ReferenceType == null)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_ReferenceTypeRequired);

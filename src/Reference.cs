@@ -3,12 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Xml;
-using System.Globalization;
-using System.Runtime.Versioning;
 using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -24,8 +22,8 @@ namespace Org.BouncyCastle.Crypto.Xml
         private string _digestMethod;
         private byte[] _digestValue;
         private IHash _hashAlgorithm;
-        private object _refTarget;
-        private ReferenceTargetType _refTargetType;
+        private readonly object _refTarget;
+        private readonly ReferenceTargetType _refTargetType;
         private XmlElement _cachedXml;
         private SignedXml _signedXml = null;
         internal CanonicalXmlNodeList _namespaces = null;
@@ -242,7 +240,6 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_InvalidElement, "Reference/Transforms");
                 }
-
                 XmlNodeList transformNodes = transformsElement.SelectNodes("ds:Transform", nsm);
                 if (transformNodes != null)
                 {
@@ -325,7 +322,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddTransform(Transform transform)
         {
             if (transform == null)
-                throw new ArgumentNullException("transform");
+                throw new ArgumentNullException(nameof(transform));
 
             transform.Reference = this;
             TransformChain.Add(transform);
@@ -336,7 +333,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             DigestValue = CalculateHashValue(document, refList);
         }
 
-        // What we want to do is pump the input throug the TransformChain and then 
+        // What we want to do is pump the input throug the TransformChain and then
         // hash the output of the chain document is the document context for resolving relative references
         internal byte[] CalculateHashValue(XmlDocument document, CanonicalXmlNodeList refList)
         {

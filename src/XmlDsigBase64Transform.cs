@@ -3,23 +3,18 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     // A class representing conversion from Base64 using CryptoStream
     public class XmlDsigBase64Transform : Transform
     {
-        private Type[] _inputTypes = { typeof(Stream), typeof(XmlNodeList), typeof(XmlDocument) };
-        private Type[] _outputTypes = { typeof(Stream) };
+        private readonly Type[] _inputTypes = { typeof(Stream), typeof(XmlNodeList), typeof(XmlDocument) };
+        private readonly Type[] _outputTypes = { typeof(Stream) };
         private CryptoStream _cs = null;
 
         public XmlDsigBase64Transform()

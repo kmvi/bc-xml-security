@@ -9,8 +9,8 @@ using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Xml;
 
@@ -64,12 +64,12 @@ namespace Org.BouncyCastle.Crypto.Xml
         // private members
         //
 
-        private XmlDocument _document;
+        private readonly XmlDocument _document;
         private XmlResolver _xmlResolver;
         // hash table defining the key name mapping
         private const int _capacity = 4; // 4 is a reasonable capacity for
                                           // the key name mapping hash table
-        private Hashtable _keyNameMapping;
+        private readonly Hashtable _keyNameMapping;
         private string _padding;
         private string _mode;
         private Encoding _encoding;
@@ -208,7 +208,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 else if (cipherData.CipherReference.Uri[0] == '#')
                 {
                     string idref = Utils.ExtractIdFromLocalUri(cipherData.CipherReference.Uri);
-                    // Serialize 
+                    // Serialize
                     XmlElement idElem = GetIdElement(_document, idref);
                     if (idElem == null || idElem.OuterXml == null)
                     {
@@ -356,7 +356,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             // if we have an EncryptedKey, decrypt to get the symmetric key
             if (ek != null)
             {
-                // now process the EncryptedKey, loop recursively 
+                // now process the EncryptedKey, loop recursively
                 // If the Uri is not provided by the application, try to get it from the EncryptionMethod
                 if (symmetricAlgorithmUri == null)
                 {
@@ -432,7 +432,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 kiX509Data = keyInfoEnum.Current as KeyInfoX509Data;
                 if (kiX509Data != null)
                 {
-                    var collection = Utils.BuildBagOfCerts(kiX509Data, CertUsageType.Decryption);
+                    IList<X509Certificate> collection = Utils.BuildBagOfCerts(kiX509Data, CertUsageType.Decryption);
                     foreach (X509Certificate certificate in collection)
                     {
                         if (privateKey != null)
@@ -460,7 +460,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         _xmlDsigSearchDepthCounter++;
                         if (IsOverXmlDsigRecursionLimit())
                         {
-                            //Throw exception once recursion limit is hit. 
+                            //Throw exception once recursion limit is hit.
                             throw new CryptoSignedXmlRecursionException();
                         }
                         else
@@ -563,7 +563,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return ed;
         }
 
-        // Encrypts the given element with the key name specified. A corresponding key name mapping 
+        // Encrypts the given element with the key name specified. A corresponding key name mapping
         // has to be defined before calling this method. The key name is added as
         // a KeyNameInfo KeyInfo to an EncryptedKey (AES session key) generated randomly.
         public EncryptedData Encrypt(XmlElement inputElement, string keyName)
@@ -876,7 +876,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
 
 
-        // encrypts the supplied input key data using an RSA key and specifies whether we want to use OAEP 
+        // encrypts the supplied input key data using an RSA key and specifies whether we want to use OAEP
         // padding or PKCS#1 v1.5 padding as described in the PKCS specification
         public static byte[] EncryptKey(byte[] keyData, RsaKeyParameters rsa, bool useOAEP)
         {
@@ -917,7 +917,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        // decrypts the supplied data using an RSA key and specifies whether we want to use OAEP 
+        // decrypts the supplied data using an RSA key and specifies whether we want to use OAEP
         // padding or PKCS#1 v1.5 padding as described in the PKCS specification
         public static byte[] DecryptKey(byte[] keyData, RsaKeyParameters rsa, bool useOAEP)
         {

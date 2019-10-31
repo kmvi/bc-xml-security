@@ -4,9 +4,8 @@
 
 using System;
 using System.Collections;
-using System.Runtime.InteropServices;
-using System.Xml;
 using System.Globalization;
+using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -16,7 +15,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private string _canonicalizationMethod;
         private string _signatureMethod;
         private string _signatureLength;
-        private ArrayList _references;
+        private readonly ArrayList _references;
         private XmlElement _cachedXml = null;
         private SignedXml _signedXml = null;
         private Transform _canonicalizationMethodTransform = null;

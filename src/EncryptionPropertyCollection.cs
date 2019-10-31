@@ -4,13 +4,12 @@
 
 using System;
 using System.Collections;
-using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     public sealed class EncryptionPropertyCollection : IList
     {
-        private ArrayList _props;
+        private readonly ArrayList _props;
 
         public EncryptionPropertyCollection()
         {

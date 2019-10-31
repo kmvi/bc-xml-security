@@ -2,11 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Xml;
-using System.IO;
 using System.Text;
-using System.Collections;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -14,8 +11,8 @@ namespace Org.BouncyCastle.Crypto.Xml
     // of this type. it maintains the node subset state and performs output rendering during canonicalization
     internal class CanonicalXmlDocument : XmlDocument, ICanonicalizableNode
     {
-        private bool _defaultNodeSetInclusionState;
-        private bool _includeComments;
+        private readonly bool _defaultNodeSetInclusionState;
+        private readonly bool _includeComments;
         private bool _isInNodeSet;
 
         public CanonicalXmlDocument(bool defaultNodeSetInclusionState, bool includeComments) : base()

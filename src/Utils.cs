@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
-using System.Threading;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -735,7 +734,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return collection;
         }
 
-        private static readonly char[] s_hexValues = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        private static readonly char[] s_hexValues = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         internal static string EncodeHexString(byte[] sArray)
         {
             return EncodeHexString(sArray, 0, (uint)sArray.Length);

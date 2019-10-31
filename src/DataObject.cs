@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.IO;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml

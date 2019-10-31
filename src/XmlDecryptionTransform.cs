@@ -6,22 +6,17 @@ using Org.BouncyCastle.Crypto.Paddings;
 using System;
 using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
-    // XML Decryption Transform is used to specify the order of XML Digital Signature 
+    // XML Decryption Transform is used to specify the order of XML Digital Signature
     // and XML Encryption when performed on the same document.
 
     public class XmlDecryptionTransform : Transform
     {
-        private Type[] _inputTypes = { typeof(Stream), typeof(XmlDocument) };
-        private Type[] _outputTypes = { typeof(XmlDocument) };
+        private readonly Type[] _inputTypes = { typeof(Stream), typeof(XmlDocument) };
+        private readonly Type[] _outputTypes = { typeof(XmlDocument) };
         private XmlNodeList _encryptedDataList = null;
         private ArrayList _arrayListUri = null; // this ArrayList object represents the Uri's to be excluded
         private EncryptedXml _exml = null; // defines the XML encryption processing rules
@@ -183,7 +178,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (parent.NodeType == XmlNodeType.Document)
             {
                 // We're replacing the root element.  In order to correctly reflect the semantics of the
-                // decryption transform, we need to replace the entire document with the decrypted data. 
+                // decryption transform, we need to replace the entire document with the decrypted data.
                 // However, EncryptedXml.ReplaceData will preserve other top-level elements such as the XML
                 // entity declaration and top level comments.  So, in this case we must do the replacement
                 // ourselves.

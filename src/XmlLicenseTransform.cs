@@ -3,21 +3,15 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     public class XmlLicenseTransform : Transform
     {
-        private Type[] _inputTypes = { typeof(XmlDocument) };
-        private Type[] _outputTypes = { typeof(XmlDocument) };
+        private readonly Type[] _inputTypes = { typeof(XmlDocument) };
+        private readonly Type[] _outputTypes = { typeof(XmlDocument) };
         private XmlNamespaceManager _namespaceManager = null;
         private XmlDocument _license = null;
         private IRelDecryptor _relDecryptor = null;

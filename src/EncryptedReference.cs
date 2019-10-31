@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -72,7 +71,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        internal protected bool CacheValid
+        protected internal bool CacheValid
         {
             get
             {
@@ -112,7 +111,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 throw new ArgumentNullException(nameof(value));
 
             ReferenceType = value.LocalName;
-            
+
             string uri = Utils.GetAttribute(value, "URI", EncryptedXml.XmlEncNamespaceUrl);
             if (uri == null)
                 throw new ArgumentNullException(SR.Cryptography_Xml_UriRequired);

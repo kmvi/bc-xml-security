@@ -4,15 +4,12 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     public sealed class ReferenceList : IList
     {
-        private ArrayList _references;
+        private readonly ArrayList _references;
 
         public ReferenceList()
         {
