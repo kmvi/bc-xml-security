@@ -20,11 +20,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
     {
         List<AsymmetricCipherKeyPair> _asymmetricKeys = new List<AsymmetricCipherKeyPair>();
 
-        public XmlLicenseEncryptedRef()
-        {
-        }
-
-        public void AddAsymmetricKey(AsymmetricCipherKeyPair key)
+        internal void AddAsymmetricKey(AsymmetricCipherKeyPair key)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
@@ -46,7 +42,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
                      || encryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncAES192Url
                      || encryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncAES256Url);
 
-            Assert.Equal(keyInfo.Count, 1);
+            Assert.Equal(1, keyInfo.Count);
 
             byte[] decryptedKey = null;
 
@@ -58,8 +54,8 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
                     EncryptedKey encryptedKey = encryptedKeyInfo.EncryptedKey;
 
                     Assert.Equal(encryptedKey.EncryptionMethod.KeyAlgorithm, EncryptedXml.XmlEncRSAOAEPUrl);
-                    Assert.Equal(encryptedKey.KeyInfo.Count, 1);
-                    Assert.NotEqual(_asymmetricKeys.Count, 0);
+                    Assert.Equal(1, encryptedKey.KeyInfo.Count);
+                    Assert.NotEqual(0, _asymmetricKeys.Count);
 
                     RsaKeyParameters rsaParams = null;
                     RsaKeyParameters rsaInputParams = null;

@@ -77,7 +77,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             Assert.Null(data.IssuerSerials);
             Assert.Null(data.SubjectKeyIds);
             Assert.Null(data.SubjectNames);
-            Assert.Equal(data.GetXml().OuterXml, "<X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\" />");
+            Assert.Equal("<X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\" />", data.GetXml().OuterXml);
         }
 
         [Fact]
