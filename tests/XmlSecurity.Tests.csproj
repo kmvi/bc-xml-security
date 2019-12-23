@@ -4,6 +4,12 @@
     <AssemblyName>XmlSecurity.Tests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="EncryptedXmlSample1.xml" />
+    <None Remove="EncryptedXmlSample2.xml" />
+    <None Remove="EncryptedXmlSample3.xml" />
+    <None Remove="XmlLicenseSample.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\src\XmlSecurity.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -14,5 +20,11 @@
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EncryptedXmlSample1.xml" />
+    <EmbeddedResource Include="EncryptedXmlSample2.xml" />
+    <EmbeddedResource Include="EncryptedXmlSample3.xml" />
+    <EmbeddedResource Include="XmlLicenseSample.xml" />
   </ItemGroup>
 </Project>

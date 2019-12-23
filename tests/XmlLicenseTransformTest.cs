@@ -109,7 +109,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         [Fact]
         public void Context_Null()
         {
-            XmlDocument doc = GetDocumentFromResource("Org.BouncyCastle.Crypto.Xml.Tests.XmlLicenseSample.xml");
+            XmlDocument doc = GetDocumentFromResource("XmlSecurity.Tests.XmlLicenseSample.xml");
 
             Assert.Throws<System.Security.Cryptography.CryptographicException>(() => transform.LoadInput(doc));
         }
@@ -127,7 +127,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         [Fact]
         public void Decryptor_Null()
         {
-            XmlDocument doc = GetDocumentFromResource("Org.BouncyCastle.Crypto.Xml.Tests.XmlLicenseSample.xml");
+            XmlDocument doc = GetDocumentFromResource("XmlSecurity.Tests.XmlLicenseSample.xml");
 
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
             namespaceManager.AddNamespace("r", "urn:mpeg:mpeg21:2003:01-REL-R-NS");
@@ -139,7 +139,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         [Fact]
         public void ValidLicense()
         {
-            XmlDocument doc = GetDocumentFromResource("Org.BouncyCastle.Crypto.Xml.Tests.XmlLicenseSample.xml");
+            XmlDocument doc = GetDocumentFromResource("XmlSecurity.Tests.XmlLicenseSample.xml");
 
             XmlNamespaceManager namespaceManager = new XmlNamespaceManager(doc.NameTable);
             namespaceManager.AddNamespace("r", "urn:mpeg:mpeg21:2003:01-REL-R-NS");
