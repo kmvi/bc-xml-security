@@ -55,7 +55,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
 
                     Assert.Equal(encryptedKey.EncryptionMethod.KeyAlgorithm, EncryptedXml.XmlEncRSAOAEPUrl);
                     Assert.Equal(1, encryptedKey.KeyInfo.Count);
-                    Assert.NotEqual(0, _asymmetricKeys.Count);
+                    Assert.NotEmpty(_asymmetricKeys);
 
                     RsaKeyParameters rsaParams = null;
                     RsaKeyParameters rsaInputParams = null;
@@ -148,7 +148,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             return new MemoryStream(decryptedContent);
         }
 
-        public static void Encrypt(Stream toEncrypt, RsaKeyParameters key, out KeyInfo keyInfo, out EncryptionMethod encryptionMethod, out CipherData cipherData)
+        internal static void Encrypt(Stream toEncrypt, RsaKeyParameters key, out KeyInfo keyInfo, out EncryptionMethod encryptionMethod, out CipherData cipherData)
         {
             var random = new SecureRandom();
             var keyData = new byte[128 / 8];

@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // See the LICENSE file in the project root for more information
 //
 // XmlLicenseTransformTest.cs - Test Cases for XmlLicenseTransform
@@ -67,11 +67,11 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             Assert.Null(transform.Decryptor);
 
             Type[] input = transform.InputTypes;
-            Assert.Equal(1, input.Length);
+            Assert.Single(input);
             Assert.Equal(typeof(XmlDocument), input[0]);
 
             Type[] output = transform.OutputTypes;
-            Assert.Equal(1, output.Length);
+            Assert.Single(output);
             Assert.Equal(typeof(XmlDocument), output[0]);
         }
 

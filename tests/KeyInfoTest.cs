@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // See the LICENSE file in the project root for more information
 //
 // KeyInfoTest.cs - Test Cases for KeyInfo
@@ -315,7 +315,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
                     pathsCovered |= 1 << 4;
 
                     var x509data = clause as KeyInfoX509Data;
-                    Assert.Equal(1, x509data.Certificates.Count);
+                    Assert.Single(x509data.Certificates);
                     X509Certificate cert = x509data.Certificates[0] as X509Certificate;
                     Assert.NotNull(cert);
                     Assert.Equal(Convert.FromBase64String(x509cert), cert.GetEncoded());

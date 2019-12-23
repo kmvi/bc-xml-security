@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // See the LICENSE file in the project root for more information
 //
 // XmlDsigC14NTransformTest.cs - Test Cases for XmlDsigC14NTransform
