@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // See the LICENSE file in the project root for more information
 //
 // XmlLicenseTransformTest.cs - Test Cases for XmlLicenseTransform
@@ -67,11 +67,11 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             Assert.Null(transform.Decryptor);
 
             Type[] input = transform.InputTypes;
-            Assert.Equal(1, input.Length);
+            Assert.Single(input);
             Assert.Equal(typeof(XmlDocument), input[0]);
 
             Type[] output = transform.OutputTypes;
-            Assert.Equal(1, output.Length);
+            Assert.Single(output);
             Assert.Equal(typeof(XmlDocument), output[0]);
         }
 
@@ -311,7 +311,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             nsMgr.AddNamespace("r", LicenseTransformNsUrl);
 
             XmlElement currentIssuerContext = context.SelectSingleNode("ancestor-or-self::r:issuer[1]", nsMgr) as XmlElement;
-            Assert.NotEqual(currentIssuerContext, null);
+            Assert.NotNull(currentIssuerContext);
 
             XmlElement signatureNode = currentIssuerContext.SelectSingleNode("descendant-or-self::dsig:Signature[1]", nsMgr) as XmlElement;
             if (signatureNode != null)
@@ -320,7 +320,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             }
 
             XmlElement currentLicenseContext = currentIssuerContext.SelectSingleNode("ancestor-or-self::r:license[1]", nsMgr) as XmlElement;
-            Assert.NotEqual(currentLicenseContext, null);
+            Assert.NotNull(currentLicenseContext);
 
             XmlNodeList issuerList = currentLicenseContext.SelectNodes("descendant-or-self::r:license[1]/r:issuer", nsMgr);
             for (int i = 0; i < issuerList.Count; i++)
