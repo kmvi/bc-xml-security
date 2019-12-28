@@ -22,9 +22,8 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
 
         public XmlLicenseEncryptedRef()
         {
-        }
-
-        public void AddAsymmetricKey(AsymmetricCipherKeyPair key)
+        } 
+        internal void AddAsymmetricKey(AsymmetricCipherKeyPair key)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
@@ -46,7 +45,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
                      || encryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncAES192Url
                      || encryptionMethod.KeyAlgorithm == EncryptedXml.XmlEncAES256Url);
 
-            Assert.Equal(keyInfo.Count, 1);
+            Assert.Equal(1, keyInfo.Count);
 
             byte[] decryptedKey = null;
 
@@ -58,8 +57,8 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
                     EncryptedKey encryptedKey = encryptedKeyInfo.EncryptedKey;
 
                     Assert.Equal(encryptedKey.EncryptionMethod.KeyAlgorithm, EncryptedXml.XmlEncRSAOAEPUrl);
-                    Assert.Equal(encryptedKey.KeyInfo.Count, 1);
-                    Assert.NotEqual(_asymmetricKeys.Count, 0);
+                    Assert.Equal(1, encryptedKey.KeyInfo.Count);
+                    Assert.NotEmpty(_asymmetricKeys);
 
                     RsaKeyParameters rsaParams = null;
                     RsaKeyParameters rsaInputParams = null;
@@ -152,7 +151,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             return new MemoryStream(decryptedContent);
         }
 
-        public static void Encrypt(Stream toEncrypt, RsaKeyParameters key, out KeyInfo keyInfo, out EncryptionMethod encryptionMethod, out CipherData cipherData)
+        internal static void Encrypt(Stream toEncrypt, RsaKeyParameters key, out KeyInfo keyInfo, out EncryptionMethod encryptionMethod, out CipherData cipherData)
         {
             var random = new SecureRandom();
             var keyData = new byte[128 / 8];

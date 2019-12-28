@@ -98,7 +98,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             Assert.True(ixmlnl, "Input XmlNodeList");
 
             Type[] output = transform.OutputTypes;
-            Assert.Equal(1, output.Length);
+            Assert.Single(output);
             Assert.Equal(typeof(Stream), output[0]);
         }
 

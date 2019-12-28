@@ -99,7 +99,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         {
             Type[] outputTypes = transform.OutputTypes;
 
-            Assert.Equal(1, outputTypes.Length);
+            Assert.Single(outputTypes);
             Assert.Contains(typeof(XmlDocument), outputTypes);
         }
 

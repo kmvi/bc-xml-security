@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -110,7 +110,7 @@ namespace System
                 // but the .NET Framework exception is not.
                 if (typeof(ArgumentException).IsAssignableFrom(typeof(TNetFxExceptionType)))
                 {
-                    Exception exception = Assert.Throws(typeof(TNetFxExceptionType), action);
+                    Exception exception = Assert.Throws<TNetFxExceptionType>(action);
                     if (!RuntimeInformation.FrameworkDescription.StartsWith(".NET Native"))
                     {
                         Assert.Equal(paramName, ((ArgumentException)exception).ParamName);

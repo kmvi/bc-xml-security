@@ -22,7 +22,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             KeyInfo keyInfo = new KeyInfo();
 
             Assert.Equal(0, keyInfo.Count);
-            Assert.Equal(null, keyInfo.Id);
+            Assert.Null(keyInfo.Id);
 
             XmlElement xmlElement = keyInfo.GetXml();
             Assert.NotNull(xmlElement);
