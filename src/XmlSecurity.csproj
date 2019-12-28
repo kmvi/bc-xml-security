@@ -7,7 +7,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
     <Authors>kmvi</Authors>
-    <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net40;netstandard2.0;netstandard2.1</TargetFrameworks>
     <SignAssembly>false</SignAssembly>
     <PackageId>bc-xml-security-portable</PackageId>
     <PackageTags>BouncyCastle, XML Security, XML Signature, XML Encryption</PackageTags>
