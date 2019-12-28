@@ -13,7 +13,7 @@
     <PackageTags>BouncyCastle, XML Security, XML Signature, XML Encryption</PackageTags>
     <PackageProjectUrl>https://github.com/kmvi/bc-xml-security</PackageProjectUrl>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <Version>1.0.0-beta-$(BuildNumber)</Version>
+    <Version>1.0.1</Version>
     <LangVersion>preview</LangVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
