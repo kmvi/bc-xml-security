@@ -4,9 +4,9 @@ Implementation of the [XML Security standards](https://www.w3.org/standards/xml/
 - XML Signature Syntax and Processing
 - XML Encryption Syntax and Processing
 
-Adapted from [corefx](https://github.com/dotnet/corefx/tree/master/src/System.Security.Cryptography.Xml) sources.
+Adapted from [.NET Core](https://github.com/dotnet/runtime/tree/master/src/libraries/System.Security.Cryptography.Xml) sources.
 
-For portable version see [portable branch](../../tree/portable) (.NET Standard 2.0).
+For portable version see [portable branch](../../tree/portable) (.NET Standard 2.0, 2.1).
 
 ### Example
 
