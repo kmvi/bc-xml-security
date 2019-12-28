@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.IO;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -29,7 +28,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public DataObject(string id, string mimeType, string encoding, XmlElement data)
         {
             if (data == null)
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException(nameof(data));
 
             _id = id;
             _mimeType = mimeType;
@@ -79,7 +78,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
 
                 // Reset the node list
                 _elData = new CanonicalXmlNodeList();
@@ -137,7 +136,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             _id = Utils.GetAttribute(value, "Id", SignedXml.XmlDsigNamespaceUrl);
             _mimeType = Utils.GetAttribute(value, "MimeType", SignedXml.XmlDsigNamespaceUrl);

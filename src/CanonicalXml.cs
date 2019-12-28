@@ -5,15 +5,14 @@
 using System.Xml;
 using System.IO;
 using System.Text;
-using System.Collections;
 using System;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     internal class CanonicalXml
     {
-        private CanonicalXmlDocument _c14nDoc;
-        private C14NAncestralNamespaceContextManager _ancMgr;
+        private readonly CanonicalXmlDocument _c14nDoc;
+        private readonly C14NAncestralNamespaceContextManager _ancMgr;
 
         // private static string defaultXPathWithoutComments = "(//. | //@* | //namespace::*)[not(self::comment())]";
         // private static string defaultXPathWithoutComments = "(//. | //@* | //namespace::*)";
@@ -23,7 +22,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal CanonicalXml(Stream inputStream, bool includeComments, XmlResolver resolver, string strBaseUri)
         {
             if (inputStream == null)
-                throw new ArgumentNullException("inputStream");
+                throw new ArgumentNullException(nameof(inputStream));
 
             _c14nDoc = new CanonicalXmlDocument(true, includeComments);
             _c14nDoc.XmlResolver = resolver;
@@ -35,7 +34,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal CanonicalXml(XmlDocument document, XmlResolver resolver, bool includeComments)
         {
             if (document == null)
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(document));
 
             _c14nDoc = new CanonicalXmlDocument(true, includeComments);
             _c14nDoc.XmlResolver = resolver;
@@ -46,11 +45,11 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal CanonicalXml(XmlNodeList nodeList, XmlResolver resolver, bool includeComments)
         {
             if (nodeList == null)
-                throw new ArgumentNullException("nodeList");
+                throw new ArgumentNullException(nameof(nodeList));
 
             XmlDocument doc = Utils.GetOwnerDocument(nodeList);
             if (doc == null)
-                throw new ArgumentException("nodeList");
+                throw new ArgumentException(nameof(nodeList));
 
             _c14nDoc = new CanonicalXmlDocument(false, includeComments);
             _c14nDoc.XmlResolver = resolver;

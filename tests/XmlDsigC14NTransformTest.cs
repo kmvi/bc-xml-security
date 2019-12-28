@@ -54,7 +54,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             CheckProperties(transform);
         }
 
-        internal void CheckProperties(XmlDsigC14NTransform transform)
+        private static void CheckProperties(XmlDsigC14NTransform transform)
         {
             Assert.Null(transform.Context);
             Assert.Equal(new[] { typeof(Stream), typeof(XmlDocument), typeof(XmlNodeList) }, transform.InputTypes);

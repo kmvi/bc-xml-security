@@ -4,15 +4,12 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     public sealed class ReferenceList : IList
     {
-        private ArrayList _references;
+        private readonly ArrayList _references;
 
         public ReferenceList()
         {
@@ -32,10 +29,10 @@ namespace Org.BouncyCastle.Crypto.Xml
         public int Add(object value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             if (!(value is DataReference) && !(value is KeyReference))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
             return _references.Add(value);
         }
@@ -58,10 +55,10 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void Insert(int index, object value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             if (!(value is DataReference) && !(value is KeyReference))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
             _references.Insert(index, value);
         }
@@ -101,10 +98,10 @@ namespace Org.BouncyCastle.Crypto.Xml
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
 
                 if (!(value is DataReference) && !(value is KeyReference))
-                    throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                    throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
                 _references[index] = value;
             }

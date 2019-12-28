@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -51,7 +50,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return GetXml(document);
         }
 
-        new internal XmlElement GetXml(XmlDocument document)
+        internal new XmlElement GetXml(XmlDocument document)
         {
             if (ReferenceType == null)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_ReferenceTypeRequired);
@@ -71,13 +70,11 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             ReferenceType = value.LocalName;
             string uri = Utils.GetAttribute(value, "URI", EncryptedXml.XmlEncNamespaceUrl);
-            if (uri == null)
-                throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriRequired);
-            Uri = uri;
+            Uri = uri ?? throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriRequired);
 
             // Transforms
             XmlNamespaceManager nsm = new XmlNamespaceManager(value.OwnerDocument.NameTable);

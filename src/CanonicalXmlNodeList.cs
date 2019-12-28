@@ -2,17 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Xml;
-using System.IO;
-using System.Text;
 using System.Collections;
+using System;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     internal class CanonicalXmlNodeList : XmlNodeList, IList
     {
-        private ArrayList _nodeArray;
+        private readonly ArrayList _nodeArray;
 
         internal CanonicalXmlNodeList()
         {
@@ -60,7 +58,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void Insert(int index, object value)
         {
             if (!(value is XmlNode))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
             _nodeArray.Insert(index, value);
         }
 
@@ -90,7 +88,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             set
             {
                 if (!(value is XmlNode))
-                    throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                    throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
                 _nodeArray[index] = value;
             }
         }

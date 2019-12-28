@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
-using System.Threading;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -51,7 +50,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal static bool IsCommittedNamespace(XmlElement element, string prefix, string value)
         {
             if (element == null)
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
 
             string name = ((prefix.Length > 0) ? "xmlns:" + prefix : "xmlns");
             if (element.HasAttribute(name) && element.GetAttribute(name) == value) return true;
@@ -61,7 +60,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal static bool IsRedundantNamespace(XmlElement element, string prefix, string value)
         {
             if (element == null)
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
 
             XmlNode ancestorNode = ((XmlNode)element).ParentNode;
             while (ancestorNode != null)
@@ -169,11 +168,11 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             int i, iCount = 0;
             for (i = 0; i < inputCount; i++)
-                if (Char.IsWhiteSpace(inputBuffer[inputOffset + i])) iCount++;
+                if (char.IsWhiteSpace(inputBuffer[inputOffset + i])) iCount++;
             char[] rgbOut = new char[inputCount - iCount];
             iCount = 0;
             for (i = 0; i < inputCount; i++)
-                if (!Char.IsWhiteSpace(inputBuffer[inputOffset + i]))
+                if (!char.IsWhiteSpace(inputBuffer[inputOffset + i]))
                 {
                     rgbOut[iCount++] = inputBuffer[inputOffset + i];
                 }
@@ -216,7 +215,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal static XmlDocument PreProcessDocumentInput(XmlDocument document, XmlResolver xmlResolver, string baseUri)
         {
             if (document == null)
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(document));
 
             MyXmlDocument doc = new MyXmlDocument();
             doc.PreserveWhitespace = document.PreserveWhitespace;
@@ -238,7 +237,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal static XmlDocument PreProcessElementInput(XmlElement elem, XmlResolver xmlResolver, string baseUri)
         {
             if (elem == null)
-                throw new ArgumentNullException("elem");
+                throw new ArgumentNullException(nameof(elem));
 
             MyXmlDocument doc = new MyXmlDocument();
             doc.PreserveWhitespace = true;
@@ -339,7 +338,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             // initialize the return value
             discardComments = true;
 
-            // Deal with XPointer of type #xpointer(id("ID")). Other XPointer support isn't handled here and is anyway optional 
+            // Deal with XPointer of type #xpointer(id("ID")). Other XPointer support isn't handled here and is anyway optional
             if (idref.StartsWith("xpointer(id(", StringComparison.Ordinal))
             {
                 int startId = idref.IndexOf("id(", StringComparison.Ordinal);
@@ -358,7 +357,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             string idref = uri.Substring(1);
 
-            // Deal with XPointer of type #xpointer(id("ID")). Other XPointer support isn't handled here and is anyway optional 
+            // Deal with XPointer of type #xpointer(id("ID")). Other XPointer support isn't handled here and is anyway optional
             if (idref.StartsWith("xpointer(id(", StringComparison.Ordinal))
             {
                 int startId = idref.IndexOf("id(", StringComparison.Ordinal);
@@ -386,9 +385,9 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        // Writes one stream (starting from the current position) into 
-        // an output stream, connecting them up and reading until 
-        // hitting the end of the input stream.  
+        // Writes one stream (starting from the current position) into
+        // an output stream, connecting them up and reading until
+        // hitting the end of the input stream.
         // returns the number of bytes copied
         internal static long Pump(Stream input, Stream output)
         {
@@ -512,7 +511,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
         }
 
-        // This method gets the attributes that should be propagated 
+        // This method gets the attributes that should be propagated
         internal static CanonicalXmlNodeList GetPropagatedAttributes(XmlElement elem)
         {
             if (elem == null)
@@ -520,7 +519,6 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             CanonicalXmlNodeList namespaces = new CanonicalXmlNodeList();
             XmlNode ancestorNode = elem;
-
             bool bDefNamespaceToAdd = true;
 
             while (ancestorNode != null)
@@ -638,9 +636,9 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal static X509IssuerSerial CreateX509IssuerSerial(string issuerName, string serialNumber)
         {
             if (issuerName == null || issuerName.Length == 0)
-                throw new ArgumentException(SR.Arg_EmptyOrNullString, "issuerName");
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, nameof(issuerName));
             if (serialNumber == null || serialNumber.Length == 0)
-                throw new ArgumentException(SR.Arg_EmptyOrNullString, "serialNumber");
+                throw new ArgumentException(SR.Arg_EmptyOrNullString, nameof(serialNumber));
 
             return new X509IssuerSerial()
             {
@@ -736,7 +734,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             return collection;
         }
 
-        private static readonly char[] s_hexValues = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        private static readonly char[] s_hexValues = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         internal static string EncodeHexString(byte[] sArray)
         {
             return EncodeHexString(sArray, 0, (uint)sArray.Length);
@@ -756,7 +754,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                     digit = (uint)(sArray[i] & 0x0f);
                     hexOrder[j++] = s_hexValues[digit];
                 }
-                result = new String(hexOrder);
+                result = new string(hexOrder);
             }
             return result;
         }

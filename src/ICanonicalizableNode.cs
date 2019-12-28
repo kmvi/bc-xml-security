@@ -2,11 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Xml;
-using System.IO;
 using System.Text;
-using System.Collections;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -21,6 +17,6 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
 
         void Write(StringBuilder strBuilder, DocPosition docPos, AncestralNamespaceContextManager anc);
-        void WriteHash(IHash signer, DocPosition docPos, AncestralNamespaceContextManager anc);
+        void WriteHash(IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc);
     }
 }

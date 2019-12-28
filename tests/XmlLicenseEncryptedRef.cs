@@ -20,9 +20,6 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
     {
         List<AsymmetricCipherKeyPair> _asymmetricKeys = new List<AsymmetricCipherKeyPair>();
 
-        public XmlLicenseEncryptedRef()
-        {
-        } 
         internal void AddAsymmetricKey(AsymmetricCipherKeyPair key)
         {
             if (key == null)

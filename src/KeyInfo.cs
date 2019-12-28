@@ -4,8 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -13,7 +11,7 @@ namespace Org.BouncyCastle.Crypto.Xml
     public class KeyInfo : IEnumerable
     {
         private string _id = null;
-        private ArrayList _keyInfoClauses;
+        private readonly ArrayList _keyInfoClauses;
 
         //
         // public constructors
@@ -65,7 +63,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             XmlElement keyInfoElement = value;
             _id = Utils.GetAttribute(keyInfoElement, "Id", SignedXml.XmlDsigNamespaceUrl);

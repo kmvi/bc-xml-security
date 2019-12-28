@@ -2,7 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-// This file contains the classes necessary to represent the Transform processing model used in 
+// This file contains the classes necessary to represent the Transform processing model used in
 // XMLDSIG. The basic idea is as follows. A Reference object contains within it a TransformChain, which
 // is an ordered set of XMLDSIG transforms (represented by <Transform>...</Transform> clauses in the XML).
 // A transform in XMLDSIG operates on an input of either an octet stream or a node set and produces
@@ -17,12 +17,7 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -30,7 +25,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
     public class TransformChain
     {
-        private ArrayList _transforms;
+        private readonly ArrayList _transforms;
 
         public TransformChain()
         {
@@ -58,7 +53,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             get
             {
                 if (index >= _transforms.Count)
-                    throw new ArgumentException(SR.ArgumentOutOfRange_Index, "index");
+                    throw new ArgumentException(SR.ArgumentOutOfRange_Index, nameof(index));
                 return (Transform)_transforms[index];
             }
         }
@@ -80,7 +75,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 }
                 else
                 {
-                    // We need translation 
+                    // We need translation
                     // For now, we just know about Stream->{XmlNodeList,XmlDocument} and {XmlNodeList,XmlDocument}->Stream
                     if (currentInput is Stream)
                     {
@@ -186,7 +181,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         internal void LoadXml(XmlElement value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             XmlNamespaceManager nsm = new XmlNamespaceManager(value.OwnerDocument.NameTable);
             nsm.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);

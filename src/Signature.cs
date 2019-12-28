@@ -16,7 +16,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private string _signatureValueId;
         private KeyInfo _keyInfo;
         private IList _embeddedObjects;
-        private CanonicalXmlNodeList _referencedItems;
+        private readonly CanonicalXmlNodeList _referencedItems;
         private SignedXml _signedXml = null;
 
         internal SignedXml SignedXml
@@ -139,7 +139,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             // Make sure we don't get passed null
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             // Signature
             XmlElement signatureElement = value;
@@ -234,4 +234,3 @@ namespace Org.BouncyCastle.Crypto.Xml
         }
     }
 }
-

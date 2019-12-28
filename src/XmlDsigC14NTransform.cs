@@ -3,23 +3,17 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     public class XmlDsigC14NTransform : Transform
     {
-        private Type[] _inputTypes = { typeof(Stream), typeof(XmlDocument), typeof(XmlNodeList) };
-        private Type[] _outputTypes = { typeof(Stream) };
+        private readonly Type[] _inputTypes = { typeof(Stream), typeof(XmlDocument), typeof(XmlNodeList) };
+        private readonly Type[] _outputTypes = { typeof(Stream) };
         private CanonicalXml _cXml;
-        private bool _includeComments = false;
+        private readonly bool _includeComments = false;
 
         public XmlDsigC14NTransform()
         {
@@ -72,7 +66,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             else
             {
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "obj");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(obj));
             }
         }
 
@@ -84,7 +78,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public override object GetOutput(Type type)
         {
             if (type != typeof(Stream) && !type.IsSubclassOf(typeof(Stream)))
-                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
             return new MemoryStream(_cXml.GetBytes());
         }
 

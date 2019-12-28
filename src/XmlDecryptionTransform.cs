@@ -6,22 +6,17 @@ using Org.BouncyCastle.Crypto.Paddings;
 using System;
 using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
-    // XML Decryption Transform is used to specify the order of XML Digital Signature 
+    // XML Decryption Transform is used to specify the order of XML Digital Signature
     // and XML Encryption when performed on the same document.
 
     public class XmlDecryptionTransform : Transform
     {
-        private Type[] _inputTypes = { typeof(Stream), typeof(XmlDocument) };
-        private Type[] _outputTypes = { typeof(XmlDocument) };
+        private readonly Type[] _inputTypes = { typeof(Stream), typeof(XmlDocument) };
+        private readonly Type[] _outputTypes = { typeof(XmlDocument) };
         private XmlNodeList _encryptedDataList = null;
         private ArrayList _arrayListUri = null; // this ArrayList object represents the Uri's to be excluded
         private EncryptedXml _exml = null; // defines the XML encryption processing rules
@@ -87,7 +82,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public void AddExceptUri(string uri)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
             ExceptUris.Add(uri);
         }
 
@@ -99,18 +94,23 @@ namespace Org.BouncyCastle.Crypto.Xml
             foreach (XmlNode node in nodeList)
             {
                 XmlElement elem = node as XmlElement;
-                if (elem != null) {
-                    if (elem.LocalName == "Except" && elem.NamespaceURI == XmlDecryptionTransformNamespaceUrl) {
+                if (elem != null)
+                {
+                    if (elem.LocalName == "Except" && elem.NamespaceURI == XmlDecryptionTransformNamespaceUrl)
+                    {
                         // the Uri is required
                         string uri = Utils.GetAttribute(elem, "URI", XmlDecryptionTransformNamespaceUrl);
                         if (uri == null || uri.Length == 0 || uri[0] != '#')
                             throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UriRequired);
-                        if (!Utils.VerifyAttributes(elem, "URI")) {
+                        if (!Utils.VerifyAttributes(elem, "URI"))
+                        {
                             throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                         }
                         string idref = Utils.ExtractIdFromLocalUri(uri);
                         ExceptUris.Add(idref);
-                    } else {
+                    }
+                    else
+                    {
                         throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_UnknownTransform);
                     }
                 }
@@ -163,7 +163,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private void LoadXmlDocumentInput(XmlDocument document)
         {
             if (document == null)
-                throw new ArgumentNullException("document");
+                throw new ArgumentNullException(nameof(document));
             _containingDocument = document;
             _nsm = new XmlNamespaceManager(document.NameTable);
             _nsm.AddNamespace("enc", EncryptedXml.XmlEncNamespaceUrl);
@@ -178,7 +178,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (parent.NodeType == XmlNodeType.Document)
             {
                 // We're replacing the root element.  In order to correctly reflect the semantics of the
-                // decryption transform, we need to replace the entire document with the decrypted data. 
+                // decryption transform, we need to replace the entire document with the decrypted data.
                 // However, EncryptedXml.ReplaceData will preserve other top-level elements such as the XML
                 // entity declaration and top level comments.  So, in this case we must do the replacement
                 // ourselves.
@@ -272,7 +272,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             if (type == typeof(XmlDocument))
                 return (XmlDocument)GetOutput();
             else
-                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
         }
     }
 }

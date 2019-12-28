@@ -4,13 +4,12 @@
 
 using System;
 using System.Collections;
-using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     public sealed class EncryptionPropertyCollection : IList
     {
-        private ArrayList _props;
+        private readonly ArrayList _props;
 
         public EncryptionPropertyCollection()
         {
@@ -31,7 +30,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         int IList.Add(object value)
         {
             if (!(value is EncryptionProperty))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
             return _props.Add(value);
         }
@@ -50,7 +49,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         bool IList.Contains(object value)
         {
             if (!(value is EncryptionProperty))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
             return _props.Contains(value);
         }
@@ -64,7 +63,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         int IList.IndexOf(object value)
         {
             if (!(value is EncryptionProperty))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
             return _props.IndexOf(value);
         }
@@ -78,7 +77,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         void IList.Insert(int index, object value)
         {
             if (!(value is EncryptionProperty))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
             _props.Insert(index, value);
         }
@@ -92,7 +91,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         void IList.Remove(object value)
         {
             if (!(value is EncryptionProperty))
-                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
             _props.Remove(value);
         }
@@ -142,7 +141,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             set
             {
                 if (!(value is EncryptionProperty))
-                    throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, "value");
+                    throw new ArgumentException(SR.Cryptography_Xml_IncorrectObjectType, nameof(value));
 
                 _props[index] = value;
             }

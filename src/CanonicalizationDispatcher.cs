@@ -2,11 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Xml;
-using System.IO;
 using System.Text;
-using System.Collections;
+using System;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
@@ -31,7 +29,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static void WriteGenericNode(XmlNode node, StringBuilder strBuilder, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (node == null)
-                throw new ArgumentNullException("node");
+                throw new ArgumentNullException(nameof(node));
 
             XmlNodeList childNodes = node.ChildNodes;
             foreach (XmlNode childNode in childNodes)
@@ -55,7 +53,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         public static void WriteHashGenericNode(XmlNode node, IHash hash, DocPosition docPos, AncestralNamespaceContextManager anc)
         {
             if (node == null)
-                throw new ArgumentNullException("node");
+                throw new ArgumentNullException(nameof(node));
 
             XmlNodeList childNodes = node.ChildNodes;
             foreach (XmlNode childNode in childNodes)

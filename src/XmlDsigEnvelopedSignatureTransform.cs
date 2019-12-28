@@ -3,23 +3,17 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Xml;
-using System.Xml.XPath;
-using System.Xml.Xsl;
 
 namespace Org.BouncyCastle.Crypto.Xml
 {
     public class XmlDsigEnvelopedSignatureTransform : Transform
     {
-        private Type[] _inputTypes = { typeof(Stream), typeof(XmlNodeList), typeof(XmlDocument) };
-        private Type[] _outputTypes = { typeof(XmlNodeList), typeof(XmlDocument) };
+        private readonly Type[] _inputTypes = { typeof(Stream), typeof(XmlNodeList), typeof(XmlDocument) };
+        private readonly Type[] _outputTypes = { typeof(XmlNodeList), typeof(XmlDocument) };
         private XmlNodeList _inputNodeList;
-        private bool _includeComments = false;
+        private readonly bool _includeComments = false;
         private XmlNamespaceManager _nsm = null;
         private XmlDocument _containingDocument = null;
         private int _signaturePosition = 0;
@@ -101,7 +95,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             // Empty node list is not acceptable
             if (nodeList == null)
-                throw new ArgumentNullException("nodeList");
+                throw new ArgumentNullException(nameof(nodeList));
             _containingDocument = Utils.GetOwnerDocument(nodeList);
             if (_containingDocument == null)
                 throw new System.Security.Cryptography.CryptographicException(SR.Cryptography_Xml_EnvelopedSignatureRequiresContext);
@@ -114,7 +108,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         private void LoadXmlDocumentInput(XmlDocument doc)
         {
             if (doc == null)
-                throw new ArgumentNullException("doc");
+                throw new ArgumentNullException(nameof(doc));
             _containingDocument = doc;
             _nsm = new XmlNamespaceManager(_containingDocument.NameTable);
             _nsm.AddNamespace("dsig", SignedXml.XmlDsigNamespaceUrl);
@@ -147,7 +141,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                         // SelectSingleNode throws an exception for xmldecl PI for example, so we will just ignore those exceptions
                         try
                         {
-                            // Find the nearest signature ancestor tag 
+                            // Find the nearest signature ancestor tag
                             XmlNode result = node.SelectSingleNode("ancestor-or-self::dsig:Signature[1]", _nsm);
                             int position = 0;
                             foreach (XmlNode node1 in signatureList)
@@ -190,12 +184,12 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             else if (type == typeof(XmlDocument) || type.IsSubclassOf(typeof(XmlDocument)))
             {
-                if (_inputNodeList != null) throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                if (_inputNodeList != null) throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
                 return (XmlDocument)GetOutput();
             }
             else
             {
-                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, "type");
+                throw new ArgumentException(SR.Cryptography_Xml_TransformIncorrectInputType, nameof(type));
             }
         }
     }

@@ -4,9 +4,6 @@
 
 using Org.BouncyCastle.Crypto.Parameters;
 using System;
-using System.Collections;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Xml;
 
 namespace Org.BouncyCastle.Crypto.Xml
@@ -48,7 +45,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// Create an XML representation.
         /// </summary>
         /// <remarks>
-        /// Based upon https://www.w3.org/TR/xmldsig-core/#sec-DSAKeyValue. 
+        /// Based upon https://www.w3.org/TR/xmldsig-core/#sec-DSAKeyValue.
         /// </remarks>
         /// <returns>
         /// An <see cref="XmlElement"/> containing the XML representation.
@@ -127,7 +124,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         /// Deserialize from the XML representation.
         /// </summary>
         /// <remarks>
-        /// Based upon https://www.w3.org/TR/xmldsig-core/#sec-DSAKeyValue. 
+        /// Based upon https://www.w3.org/TR/xmldsig-core/#sec-DSAKeyValue.
         /// </remarks>
         /// <param name="value">
         /// An <see cref="XmlElement"/> containing the XML representation. This cannot be null.
@@ -142,7 +139,7 @@ namespace Org.BouncyCastle.Crypto.Xml
         {
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
             if (value.Name != KeyValueElementName
                 || value.NamespaceURI != SignedXml.XmlDsigNamespaceUrl)
@@ -192,7 +189,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             }
             catch (Exception ex)
             {
-                throw new System.Security.Cryptography.CryptographicException("An error occurred parsing the key components", ex);
+                throw new System.Security.Cryptography.CryptographicException($"An error occurred parsing the key components", ex);
             }
         }
     }
