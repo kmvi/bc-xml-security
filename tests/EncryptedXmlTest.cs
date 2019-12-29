@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // See the LICENSE file in the project root for more information
 //
 // EncryptedXmlTest.cs
@@ -59,8 +59,8 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         }
 
         [Theory]
-        [InlineData("XmlSecurity.Tests.EncryptedXmlSample1.xml")]
-        [InlineData("XmlSecurity.Tests.EncryptedXmlSample3.xml")]
+        [InlineData("Org.BouncyCastle.Crypto.Xml.Tests.EncryptedXmlSample1.xml")]
+        [InlineData("Org.BouncyCastle.Crypto.Xml.Tests.EncryptedXmlSample3.xml")]
         public void RsaDecryption(string resourceName)
         {
             XmlDocument doc = new XmlDocument();
@@ -121,7 +121,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
 
             XmlDocument doc = new XmlDocument();
             doc.PreserveWhitespace = true;
-            doc.Load(TestHelpers.LoadResourceStream("XmlSecurity.Tests.EncryptedXmlSample2.xml"));
+            doc.Load(TestHelpers.LoadResourceStream("Org.BouncyCastle.Crypto.Xml.Tests.EncryptedXmlSample2.xml"));
             EncryptedXml encxml = new EncryptedXml(doc);
             EncryptedData edata = new EncryptedData();
             edata.LoadXml(doc.DocumentElement);
