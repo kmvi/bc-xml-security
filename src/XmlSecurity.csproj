@@ -68,7 +68,6 @@
     <Compile Include="DataObject.cs" />
     <Compile Include="DataReference.cs" />
     <Compile Include="DocPosition.cs" />
-    <Compile Include="DsaDigestSigner2.cs" />
     <Compile Include="DSAKeyValue.cs" />
     <Compile Include="EncryptedData.cs" />
     <Compile Include="EncryptedKey.cs" />
