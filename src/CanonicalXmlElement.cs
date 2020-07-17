@@ -66,7 +66,7 @@ namespace Org.BouncyCastle.Crypto.Xml
             {
                 anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
 
-                strBuilder.Append("<" + Name);
+                strBuilder.Append('<').Append(Name);
                 foreach (object attr in nsListToRender.GetKeyList())
                 {
                     (attr as CanonicalXmlAttribute).Write(strBuilder, docPos, anc);
@@ -75,7 +75,7 @@ namespace Org.BouncyCastle.Crypto.Xml
                 {
                     (attr as CanonicalXmlAttribute).Write(strBuilder, docPos, anc);
                 }
-                strBuilder.Append(">");
+                strBuilder.Append('>');
             }
 
             anc.EnterElementContext();

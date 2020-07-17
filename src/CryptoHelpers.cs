@@ -16,8 +16,6 @@ namespace Org.BouncyCastle.Crypto.Xml
     {
         private static readonly char[] _invalidChars = new char[] { ',', '`', '[', '*', '&' };
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5350", Justification = "SHA1 needed for compat.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5351", Justification = "HMACMD5 needed for compat.")]
         public static object CreateFromKnownName(string name) =>
             name switch
             {

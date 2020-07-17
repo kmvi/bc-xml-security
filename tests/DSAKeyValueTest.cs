@@ -90,7 +90,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             Assert.Equal(dsaKeyValue1.GetXml(), dsaKeyValue2.GetXml());
         }
 
-        [Fact(Skip = "https://github.com/dotnet/corefx/issues/16779")]
+        [Fact]
         public void LoadXml()
         {
             const string pValue = "oDZlcdJA1Kf6UeNEIZqm4KDqA6zpX7CmEtAGWi9pgnBhWOUDVEfhswfsvTLR5BCbKfE6KoHvt5Hh8D1RcAko//iZkLZ+gds9y/5Oxape8tu3TUi1BnNPWu8ieXjMtdnpyudKFsCymssJked1rBeRePG23HTVwOV1DpopjRkjBEU=";
@@ -108,14 +108,20 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             dsaKeyValue.LoadXml(xmlDoc.DocumentElement);
 
             var parameters = dsaKeyValue.Key.Parameters;
-            Assert.Equal(Convert.ToBase64String(parameters.P.ToByteArray()), pValue);
-            Assert.Equal(Convert.ToBase64String(parameters.Q.ToByteArray()), qValue);
-            Assert.Equal(Convert.ToBase64String(parameters.G.ToByteArray()), gValue);
-            Assert.Equal(Convert.ToBase64String(dsaKeyValue.Key.Y.ToByteArray()), yValue);
+            Assert.Equal(Convert.ToBase64String(parameters.P.ToByteArrayUnsigned()), pValue);
+            Assert.Equal(Convert.ToBase64String(parameters.Q.ToByteArrayUnsigned()), qValue);
+            Assert.Equal(Convert.ToBase64String(parameters.G.ToByteArrayUnsigned()), gValue);
+            Assert.Equal(Convert.ToBase64String(dsaKeyValue.Key.Y.ToByteArrayUnsigned()), yValue);
+            
             var seed = parameters.ValidationParameters.GetSeed();
-            Assert.NotNull(seed);
-            Assert.Equal(Convert.ToBase64String(seed), seedValue);
-            Assert.Equal(BitConverter.GetBytes(parameters.ValidationParameters.Counter)[0], Convert.FromBase64String(pgenCounterValue)[0]);
+            
+            // Not all providers support round-tripping the seed value.
+            // Seed and PGenCounter are round-tripped together.
+            if (seed != null)
+            {
+                Assert.Equal(Convert.ToBase64String(seed), seedValue);
+                Assert.Equal(BitConverter.GetBytes(parameters.ValidationParameters.Counter)[0], Convert.FromBase64String(pgenCounterValue)[0]);
+            }
         }
 
         [Fact]
