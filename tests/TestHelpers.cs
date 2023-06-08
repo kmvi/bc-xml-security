@@ -140,7 +140,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
 
         public static Tuple<X509.X509Certificate, AsymmetricKeyParameter> GetSampleX509Certificate()
         {
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(SamplePfx))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();

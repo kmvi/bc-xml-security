@@ -87,7 +87,7 @@ namespace _SignedXml.Samples
 
         public static Tuple<X509Certificate, AsymmetricKeyParameter> GetSampleX509Certificate()
         {
-            Pkcs12Store store = new Pkcs12Store();
+            Pkcs12Store store = new Pkcs12StoreBuilder().Build();
 
             char[] password = "mono".ToCharArray();
             using (MemoryStream ms = new MemoryStream(SamplePfx))

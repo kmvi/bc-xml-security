@@ -92,7 +92,7 @@ namespace _SignedXml.Samples
         {
             // To generate self-signed certificate, see GostUtilities.cs
 
-            Pkcs12Store store = new Pkcs12Store();
+            Pkcs12Store store = new Pkcs12StoreBuilder().Build();
 
             char[] password = "mono".ToCharArray();
             using (MemoryStream ms = new MemoryStream(SamplePfx))

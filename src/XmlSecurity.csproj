@@ -7,7 +7,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
     <Authors>kmvi</Authors>
-    <TargetFrameworks>net40;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <SignAssembly>false</SignAssembly>
     <PackageId>bc-xml-security-portable</PackageId>
     <PackageTags>BouncyCastle, XML Security, XML Signature, XML Encryption</PackageTags>
@@ -24,7 +24,7 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.8" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
   </ItemGroup>
   
 </Project>

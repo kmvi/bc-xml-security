@@ -675,7 +675,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             
             Assert.Equal("IKbfdK2/DMfXyezCf5QggVCXfk8=", Convert.ToBase64String(digest));
 
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(_pkcs12))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();
@@ -744,7 +744,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
 
             Assert.Equal("e3dsi1xK8FAx1vsug7J203JbEAU=", Convert.ToBase64String(digest));
 
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(_pkcs12))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();
@@ -791,7 +791,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         [Fact]
         public void SignedXML_CRLF_Invalid()
         {
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(_pkcs12))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();
@@ -859,7 +859,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         [Fact]
         public void SignedXML_CRLF_Valid()
         {
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(_pkcs12))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();
@@ -921,7 +921,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         [Fact]
         public void SignedXML_LF_Valid()
         {
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(_pkcs12))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();
@@ -984,7 +984,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
         public void MultipleX509Certificates()
         {
             XmlDocument doc = null;
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(_pkcs12))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();
