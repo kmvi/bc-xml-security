@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -140,7 +140,7 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
 
         public static Tuple<X509.X509Certificate, AsymmetricKeyParameter> GetSampleX509Certificate()
         {
-            var store = new Pkcs12Store();
+            var store = new Pkcs12StoreBuilder().Build();
             using (var ms = new MemoryStream(SamplePfx))
                 store.Load(ms, "mono".ToCharArray());
             var alias = store.Aliases.Cast<string>().First();
@@ -149,9 +149,9 @@ namespace Org.BouncyCastle.Crypto.Xml.Tests
             return Tuple.Create(cert, privKey);
         }
 
-        public static Stream LoadResourceStream(string resourceName)
+        public static Stream LoadResourceStream(string resourceName) 
         {
-            return typeof(TestHelpers).Assembly.GetManifestResourceStream(resourceName);
+             return typeof(TestHelpers).Assembly.GetManifestResourceStream(resourceName);
         }
 
         public static byte[] LoadResource(string resourceName)

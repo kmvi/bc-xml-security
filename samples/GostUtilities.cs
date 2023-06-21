@@ -56,7 +56,7 @@ namespace _SignedXml.Samples
                 get { return this.algID; }
             }
 
-            public IStreamCalculator CreateCalculator()
+            public IStreamCalculator<IBlockResult> CreateCalculator()
             {
                 ISigner signer;
                 if (algID.Algorithm.Equals(RosstandartObjectIdentifiers.id_tc26_signwithdigest_gost_3410_12_256))

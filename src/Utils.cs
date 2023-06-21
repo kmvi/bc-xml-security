@@ -7,6 +7,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Pkix;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities.Collections;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Store;
 using System;
@@ -802,7 +803,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             // Separate root from itermediate
             var intermediateCerts = new List<X509Certificate>();
-            var rootCerts = new BouncyCastle.Utilities.Collections.HashSet();
+            var rootCerts = new HashSet<TrustAnchor>();
 
             foreach (var cert in additionalCertificates) {
                 // Separate root and subordinate certificates
@@ -821,12 +822,7 @@ namespace Org.BouncyCastle.Crypto.Xml
 
             PkixBuilderParameters builderParams = new PkixBuilderParameters(rootCerts, holder);
             builderParams.IsRevocationEnabled = false;
-
-            X509CollectionStoreParameters intermediateStoreParameters =
-                new X509CollectionStoreParameters(intermediateCerts);
-
-            builderParams.AddStore(X509StoreFactory.Create(
-                "Certificate/Collection", intermediateStoreParameters));
+            builderParams.AddStoreCert(new X509CertificateStore(intermediateCerts));
 
             PkixCertPathBuilderResult result = builder.Build(builderParams);
 
@@ -883,6 +879,21 @@ namespace Org.BouncyCastle.Crypto.Xml
             byte[] keyBytes = new byte[sizeInBytes];
             random.NextBytes(keyBytes);
             return keyBytes;
+        }
+
+        class X509CertificateStore : IStore<X509Certificate>
+        {
+            private readonly IEnumerable<X509Certificate> _local;
+
+            public X509CertificateStore(IEnumerable<X509Certificate> collection)
+            {
+                _local = collection;
+            }
+
+            public IEnumerable<X509Certificate> EnumerateMatches(ISelector<X509Certificate> selector)
+            {
+                return selector == null ? _local : _local.Where(selector.Match).ToArray();
+            }
         }
     }
 }

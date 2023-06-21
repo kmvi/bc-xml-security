@@ -6,8 +6,6 @@ Implementation of the [XML Security standards](https://www.w3.org/standards/xml/
 
 Adapted from [.NET Core](https://github.com/dotnet/runtime/tree/master/src/libraries/System.Security.Cryptography.Xml) sources.
 
-For portable version see [portable branch](../../tree/portable) (.NET Standard 2.0, 2.1).
-
 ### Example
 
 See [samples folder](https://github.com/kmvi/bc-xml-security/tree/master/samples)
