@@ -12,12 +12,12 @@ See [samples folder](https://github.com/kmvi/bc-xml-security/tree/master/samples
 
 ```csharp
 // Load certificate and private key form PKCS12 container
-var store = new Pkcs12Store();
-using (var strm = File.OpenRead(@"d:\123.pfx"))
+Pkcs12Store store = new Pkcs12StoreBuilder().Build();
+using (FileStream strm = File.OpenRead(@"d:\123.pfx"))
 	store.Load(strm, new [] { '1' });
-var alias = store.Aliases.Cast<string>().First();
-var cert = store.GetCertificate(alias).Certificate;
-var privKey = store.GetKey(alias).Key;
+string alias = store.Aliases.First();
+X509Certificate cert = store.GetCertificate(alias).Certificate;
+AsymmetricKeyParameter privKey = store.GetKey(alias).Key;
 
 // Element to sign
 var doc = new XmlDocument();
@@ -38,7 +38,7 @@ sgn.SignedInfo.SignatureMethod = SignedXml.XmlDsigRSASHA1Url;
 sgn.SigningKey = privKey;
 
 sgn.ComputeSignature();
-var signature = sgn.GetXml(); // <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> ...
+XmlElement signature = sgn.GetXml(); // <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> ...
 
 // Check signature
 var sgn2 = new SignedXml(doc);
