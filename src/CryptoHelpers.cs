@@ -44,8 +44,8 @@ namespace Org.BouncyCastle.Crypto.Xml
                 "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512" => SignerUtilities.GetSigner("SHA512WITHRSA"),
                 "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411" => SignerUtilities.GetSigner("GOST3411WITHECGOST3410"),
                 "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411" => SignerUtilities.GetSigner("GOST3411WITHECGOST3410"),
-                "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012256" => new Gost3410DigestSigner(new ECGost3410Signer(), new Gost3411_2012_256Digest()),
-                "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012512" => new Gost3410DigestSigner(new ECGost3410Signer(), new Gost3411_2012_512Digest()),
+                "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012-256" => new Gost3410DigestSigner(new ECGost3410Signer(), new Gost3411_2012_256Digest()),
+                "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102012-gostr34112012-512" => new Gost3410DigestSigner(new ECGost3410Signer(), new Gost3411_2012_512Digest()),
 
                 // workarounds for issue https://github.com/dotnet/corefx/issues/16563
                 // remove attribute from this method when removing them
