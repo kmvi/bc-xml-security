@@ -9,20 +9,27 @@
     <Authors>kmvi</Authors>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <SignAssembly>false</SignAssembly>
-    <PackageId>bc-xml-security-portable</PackageId>
-    <PackageTags>BouncyCastle, XML Security, XML Signature, XML Encryption</PackageTags>
-    <PackageProjectUrl>https://github.com/kmvi/bc-xml-security</PackageProjectUrl>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageId>bc-xml-security</PackageId>
+    <PackageTags>bouncycastle, xml-security, xml-encryption, xml-signature</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Version>1.1.1</Version>
     <LangVersion>preview</LangVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RootNamespace>Org.BouncyCastle.Crypto.Xml</RootNamespace>
-    <PackageLicenseExpression>https://raw.githubusercontent.com/kmvi/bc-xml-security/master/LICENSE.TXT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/kmvi/bc-xml-security</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
   </ItemGroup>
